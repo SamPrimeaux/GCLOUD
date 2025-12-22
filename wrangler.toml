@@ -48,7 +48,7 @@ bucket_name = "meauxbility-dashboard"
 [[d1_databases]]
 binding = "MEAUXOS_DB"
 database_name = "meauxos"
-database_id = "your-database-id"  # Get from Cloudflare dashboard
+database_id = "d8261777-9384-44f7-924d-c92247d55b46"
 
 # Vectorize Index
 [[vectorize]]
