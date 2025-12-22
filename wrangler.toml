@@ -1,0 +1,44 @@
+# Cloudflare Workers Configuration
+name = "meaux-os"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+# Account ID (can be overridden by env var)
+account_id = "ede6590ac0d2fb7daf155b35653457b2"
+
+# Workers configuration
+workers_dev = true
+route = ""
+zone_id = ""
+
+# Build configuration
+[build]
+command = "npm run build"
+# cwd = "/"
+# watch_dir = "src"
+
+# Environment variables
+[vars]
+ENVIRONMENT = "production"
+
+# KV Namespaces (add if needed)
+# [[kv_namespaces]]
+# binding = "MY_KV"
+# id = "your_kv_namespace_id"
+
+# Durable Objects (add if needed)
+# [[durable_objects.bindings]]
+# name = "MY_DURABLE_OBJECT"
+# class_name = "MyDurableObject"
+
+# R2 Buckets (add if needed)
+# [[r2_buckets]]
+# binding = "MY_BUCKET"
+# bucket_name = "my-bucket"
+
+# Secrets (set via: wrangler secret put SECRET_NAME)
+# Or via environment variables in CI/CD
+# - CLOUDFLARE_API_TOKEN
+# - SUPABASE_URL
+# - SUPABASE_SERVICE_ROLE_KEY
+# - INTERNAL_SYNC_TOKEN

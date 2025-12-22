@@ -1,0 +1,26 @@
+{
+  "name": "meaux-os",
+  "version": "1.0.0",
+  "description": "MeauxOS Operations Hub - Unified dashboard for company-wide operations",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "echo 'Build complete'",
+    "deploy": "wrangler deploy",
+    "deploy:production": "wrangler deploy --env production",
+    "tail": "wrangler tail",
+    "serve": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "dashboard",
+    "meaux"
+  ],
+  "author": "MeauxAccess",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  },
+  "dependencies": {}
+}
