@@ -12,7 +12,7 @@ async function chatWithGPT4(message) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.GITHUB_MODELS_TOKEN}`,
+      'Authorization': `Bearer ${process.env.GCLOUD_GH_TOKEN}`,
     },
     body: JSON.stringify({
       model: 'gpt-4o',
@@ -39,7 +39,7 @@ async function chatWithGPT4(message) {
 async function listAvailableModels() {
   const response = await fetch('https://models.inference.ai.azure.com/models', {
     headers: {
-      'Authorization': `Bearer ${process.env.GITHUB_MODELS_TOKEN}`,
+      'Authorization': `Bearer ${process.env.GCLOUD_GH_TOKEN}`,
     }
   });
 
@@ -52,7 +52,7 @@ async function streamChatResponse(message) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.GITHUB_MODELS_TOKEN}`,
+      'Authorization': `Bearer ${process.env.GCLOUD_GH_TOKEN}`,
     },
     body: JSON.stringify({
       model: 'gpt-4o',
@@ -83,7 +83,7 @@ export default {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${env.GITHUB_MODELS_TOKEN}`,
+          'Authorization': `Bearer ${env.GCLOUD_GH_TOKEN}`,
         },
         body: JSON.stringify({
           model: 'gpt-4o',

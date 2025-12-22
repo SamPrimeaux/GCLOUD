@@ -51,7 +51,7 @@ cp .env.example .env
 |----------|-------------|
 | `INTERNAL_SYNC_TOKEN` | Any secure random string for internal API authentication |
 | `MEAUXBILITY_GH_DASHBOARD` | GitHub Personal Access Token for dashboard integration |
-| `GITHUB_MODELS_TOKEN` | GitHub Models API token for AI model access (GPT-4, etc.) |
+| `GCLOUD_GH_TOKEN` | GitHub Models API token for AI model access (GPT-4, etc.) |
 
 ### 3. GitHub Secrets Configuration
 

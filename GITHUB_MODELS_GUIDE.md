@@ -6,7 +6,7 @@ GitHub Models provides **free access** to AI models (GPT-4, GPT-4o, Llama, Mistr
 
 ## 🔑 Your Token
 
-Your GitHub Models token is stored in the `.env` file as `GITHUB_MODELS_TOKEN`.
+Your GitHub Models token is stored in the `.env` file as `GCLOUD_GH_TOKEN`.
 
 ✅ Already added to `.env` file
 ⚠️ Never commit this token to git (it's in `.gitignore`)
@@ -29,7 +29,7 @@ Your GitHub Models token is stored in the `.env` file as `GITHUB_MODELS_TOKEN`.
 ```bash
 curl -X POST https://models.inference.ai.azure.com/chat/completions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $GITHUB_MODELS_TOKEN" \
+  -H "Authorization: Bearer $GCLOUD_GH_TOKEN" \
   -d '{
     "model": "gpt-4o",
     "messages": [
@@ -45,7 +45,7 @@ curl -X POST https://models.inference.ai.azure.com/chat/completions \
 
 ```javascript
 // Load environment variables
-const token = process.env.GITHUB_MODELS_TOKEN;
+const token = process.env.GCLOUD_GH_TOKEN;
 
 async function chat(message) {
   const response = await fetch('https://models.inference.ai.azure.com/chat/completions', {
@@ -81,7 +81,7 @@ export default {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${env.GITHUB_MODELS_TOKEN}`,
+          'Authorization': `Bearer ${env.GCLOUD_GH_TOKEN}`,
         },
         body: JSON.stringify({
           model: 'gpt-4o',
@@ -101,7 +101,7 @@ export default {
 
 ```bash
 # Using Wrangler CLI
-wrangler secret put GITHUB_MODELS_TOKEN
+wrangler secret put GCLOUD_GH_TOKEN
 # Paste your token when prompted
 ```
 
@@ -109,7 +109,7 @@ wrangler secret put GITHUB_MODELS_TOKEN
 
 1. Go to: https://github.com/SamPrimeaux/GCLOUD/settings/secrets/actions
 2. Click "New repository secret"
-3. Name: `GITHUB_MODELS_TOKEN`
+3. Name: `GCLOUD_GH_TOKEN`
 4. Value: (paste your GitHub Models token from `.env` file)
 
 ## 💡 Use Cases for GCLOUD
@@ -121,7 +121,7 @@ async function helpUser(question) {
   const response = await fetch('https://models.inference.ai.azure.com/chat/completions', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${GITHUB_MODELS_TOKEN}`,
+      'Authorization': `Bearer ${GCLOUD_GH_TOKEN}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -172,7 +172,7 @@ async function summarizeDocument(text) {
 - [x] Token created
 - [x] Token added to `.env`
 - [x] Example code created (`src/github-models.js`)
-- [ ] Add to Cloudflare Worker secrets (run: `wrangler secret put GITHUB_MODELS_TOKEN`)
+- [ ] Add to Cloudflare Worker secrets (run: `wrangler secret put GCLOUD_GH_TOKEN`)
 - [ ] Add to GitHub repository secrets
 - [ ] Test API connection
 - [ ] Implement in MeauxOS chat boards
