@@ -59,8 +59,11 @@ export default {
         version: '3.0.0',
         features: {
           mcp: true,
+          mcp_tools: 13,
           d1: !!env.MEAUXOS_DB,
           r2_buckets: 5,
+          secret_management: true,
+          knowledge_base: true,
           vectorize: !!env.VECTORIZE,
           github_models: !!env.GCLOUD_GH_TOKEN
         }
@@ -169,6 +172,103 @@ async function handleAPI(request, env, ctx) {
     }
   }
 
+  // API: Register API key fingerprint
+  if (url.pathname === '/api/secrets/register' && request.method === 'POST') {
+    try {
+      const { service_name, fingerprint, env_var_names, notes } = await request.json();
+      const server = new MCPServer(env);
+      const result = await server.registerApiKey({ service_name, fingerprint, env_var_names, notes });
+
+      return new Response(JSON.stringify({
+        success: true,
+        data: result
+      }), { headers: corsHeaders });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), { status: 500, headers: corsHeaders });
+    }
+  }
+
+  // API: Verify API key fingerprint
+  if (url.pathname === '/api/secrets/verify' && request.method === 'POST') {
+    try {
+      const { service_name, fingerprint } = await request.json();
+      const server = new MCPServer(env);
+      const result = await server.verifyApiKey({ service_name, fingerprint });
+
+      return new Response(JSON.stringify({
+        success: true,
+        data: result
+      }), { headers: corsHeaders });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), { status: 500, headers: corsHeaders });
+    }
+  }
+
+  // API: List API keys
+  if (url.pathname === '/api/secrets/list') {
+    try {
+      const active_only = url.searchParams.get('active_only') !== 'false';
+      const server = new MCPServer(env);
+      const result = await server.listApiKeys({ active_only });
+
+      return new Response(JSON.stringify({
+        success: true,
+        data: result
+      }), { headers: corsHeaders });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), { status: 500, headers: corsHeaders });
+    }
+  }
+
+  // API: Store knowledge base entry
+  if (url.pathname === '/api/knowledge/store' && request.method === 'POST') {
+    try {
+      const { id, category, title, content } = await request.json();
+      const server = new MCPServer(env);
+      const result = await server.storeKnowledge({ id, category, title, content });
+
+      return new Response(JSON.stringify({
+        success: true,
+        data: result
+      }), { headers: corsHeaders });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), { status: 500, headers: corsHeaders });
+    }
+  }
+
+  // API: Query knowledge base
+  if (url.pathname === '/api/knowledge/query') {
+    try {
+      const category = url.searchParams.get('category');
+      const search = url.searchParams.get('search');
+      const limit = parseInt(url.searchParams.get('limit') || '50');
+      const server = new MCPServer(env);
+      const result = await server.queryKnowledge({ category, search, limit });
+
+      return new Response(JSON.stringify({
+        success: true,
+        data: result
+      }), { headers: corsHeaders });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), { status: 500, headers: corsHeaders });
+    }
+  }
+
   // API: GitHub Models chat
   if (url.pathname === '/api/chat' && request.method === 'POST') {
     try {
@@ -216,6 +316,11 @@ async function handleAPI(request, env, ctx) {
       '/api/d1/query',
       '/api/r2/buckets',
       '/api/r2/sync/:bucket_name',
+      '/api/secrets/register (POST)',
+      '/api/secrets/verify (POST)',
+      '/api/secrets/list',
+      '/api/knowledge/store (POST)',
+      '/api/knowledge/query',
       '/api/chat'
     ]
   }), {

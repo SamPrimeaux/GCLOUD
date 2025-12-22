@@ -8,6 +8,8 @@ GCLOUD v3 now includes a **full MCP server** that enables AI assistants to query
 - Query metadata about all 76+ R2 buckets using SQL
 - List, search, and analyze R2 objects
 - Sync R2 bucket metadata to D1 for powerful SQL queries
+- Securely manage API key fingerprints (SHA256 hashing)
+- Store and query AI knowledge base entries
 - Integrate with Supabase
 - Access GitHub Models API for AI chat
 
@@ -28,13 +30,15 @@ GCLOUD v3 now includes a **full MCP server** that enables AI assistants to query
 │                                                      │
 │  ┌──────────────┐       ┌─────────────────────┐    │
 │  │ MCP Server   │←──────│  HTTP Endpoint      │    │
-│  │ (8 Tools)    │       │  POST /mcp          │    │
+│  │ (13 Tools)   │       │  POST /mcp          │    │
 │  └──────┬───────┘       └─────────────────────┘    │
 │         │                                            │
 │         ├─→ D1 Database (MEAUXOS_DB)                │
 │         │   • r2_buckets (registry)                 │
 │         │   • r2_objects (76+ buckets indexed)      │
 │         │   • mcp_tool_logs                         │
+│         │   • api_keys (fingerprints only)          │
+│         │   • ai_knowledge_base                     │
 │         │                                            │
 │         ├─→ R2 Buckets (5 bound + 71 queryable)     │
 │         │   • APP_ASSETS                            │
@@ -178,6 +182,96 @@ Get analytics and usage statistics.
 }
 ```
 
+### 9. `register_api_key` 🔐
+
+Register or update an API key fingerprint (SHA256 hash only).
+
+```json
+{
+  "name": "register_api_key",
+  "arguments": {
+    "service_name": "google-gemini",
+    "fingerprint": "4a3b2c1d8f7e6a5b...",
+    "env_var_names": "GOOGLE_GEMINI_KEY,GEMINI_API_KEY",
+    "notes": "Google Gemini API for AI/ML"
+  }
+}
+```
+
+**Security:** Only SHA256 fingerprints are stored, never plaintext keys.
+
+### 10. `verify_api_key` ✓
+
+Verify if a key fingerprint matches the stored fingerprint.
+
+```json
+{
+  "name": "verify_api_key",
+  "arguments": {
+    "service_name": "google-gemini",
+    "fingerprint": "4a3b2c1d8f7e6a5b..."
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "service_name": "google-gemini",
+  "verified": true,
+  "is_active": true,
+  "last_verified": "2025-12-22T10:30:00.000Z"
+}
+```
+
+### 11. `list_api_keys` 🔑
+
+List all registered API keys (fingerprints only).
+
+```json
+{
+  "name": "list_api_keys",
+  "arguments": {
+    "active_only": true
+  }
+}
+```
+
+### 12. `store_knowledge` 📚
+
+Store or update entry in AI knowledge base.
+
+```json
+{
+  "name": "store_knowledge",
+  "arguments": {
+    "id": "secret-google-gemini",
+    "category": "secrets",
+    "title": "Google Gemini API key metadata",
+    "content": {
+      "service": "google/gemini",
+      "env_var_names": ["GOOGLE_GEMINI_KEY", "GEMINI_API_KEY"],
+      "stored_plaintext": false
+    }
+  }
+}
+```
+
+### 13. `query_knowledge` 🔍
+
+Query AI knowledge base by category or search.
+
+```json
+{
+  "name": "query_knowledge",
+  "arguments": {
+    "category": "secrets",
+    "search": "gemini",
+    "limit": 50
+  }
+}
+```
+
 ## 🔧 API Endpoints
 
 ### MCP Protocol Endpoint
@@ -234,6 +328,56 @@ Content-Type: application/json
 }
 ```
 
+#### 7. Register API Key Fingerprint 🔐
+```bash
+POST https://gcloudv3.meauxbility.workers.dev/api/secrets/register
+Content-Type: application/json
+
+{
+  "service_name": "google-gemini",
+  "fingerprint": "4a3b2c1d8f7e6a5b...",
+  "env_var_names": "GOOGLE_GEMINI_KEY,GEMINI_API_KEY",
+  "notes": "Google Gemini API for AI/ML"
+}
+```
+
+#### 8. Verify API Key Fingerprint
+```bash
+POST https://gcloudv3.meauxbility.workers.dev/api/secrets/verify
+Content-Type: application/json
+
+{
+  "service_name": "google-gemini",
+  "fingerprint": "4a3b2c1d8f7e6a5b..."
+}
+```
+
+#### 9. List API Keys
+```bash
+GET https://gcloudv3.meauxbility.workers.dev/api/secrets/list?active_only=true
+```
+
+#### 10. Store Knowledge Base Entry
+```bash
+POST https://gcloudv3.meauxbility.workers.dev/api/knowledge/store
+Content-Type: application/json
+
+{
+  "id": "secret-google-gemini",
+  "category": "secrets",
+  "title": "Google Gemini API key metadata",
+  "content": {
+    "service": "google/gemini",
+    "stored_plaintext": false
+  }
+}
+```
+
+#### 11. Query Knowledge Base
+```bash
+GET https://gcloudv3.meauxbility.workers.dev/api/knowledge/query?category=secrets&limit=50
+```
+
 ## 🗄️ Database Schema
 
 ### Tables
@@ -273,6 +417,31 @@ Audit log of all MCP tool executions
 | tool_name | TEXT | Tool that was called |
 | parameters | JSON | Tool arguments |
 | result | JSON | Tool response |
+
+#### `api_keys` 🔐
+Secure API key fingerprint storage (SHA256 hashes only)
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | INTEGER | Primary key |
+| service_name | TEXT | Service identifier (unique) |
+| key_fingerprint | TEXT | SHA256 hash (64 chars) |
+| env_var_names | TEXT | Comma-separated env vars |
+| last_verified | DATETIME | Last verification time |
+| is_active | BOOLEAN | Active status |
+| notes | TEXT | Optional notes |
+
+#### `ai_knowledge_base`
+AI-accessible knowledge base with arbitrary JSON content
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | TEXT | Unique identifier (primary key) |
+| category | TEXT | Category (e.g., secrets, docs) |
+| title | TEXT | Entry title |
+| content | JSON | Arbitrary JSON data |
+| created_at | INTEGER | Unix timestamp |
+| updated_at | INTEGER | Unix timestamp |
 | execution_time_ms | INTEGER | Execution duration |
 | success | BOOLEAN | Success/failure |
 | error_message | TEXT | Error details |

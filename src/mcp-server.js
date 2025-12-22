@@ -125,6 +125,78 @@ export class MCPServer {
           }
         },
         handler: this.analyzeR2Usage.bind(this)
+      },
+
+      // Register API Key Fingerprint
+      'register_api_key': {
+        description: 'Register or update API key fingerprint (SHA256 hash only, never plaintext)',
+        parameters: {
+          type: 'object',
+          properties: {
+            service_name: { type: 'string', description: 'Service identifier (e.g., google-gemini, cloudflare)' },
+            fingerprint: { type: 'string', description: 'SHA256 hash of the API key' },
+            env_var_names: { type: 'string', description: 'Comma-separated environment variable names' },
+            notes: { type: 'string', description: 'Optional notes' }
+          },
+          required: ['service_name', 'fingerprint']
+        },
+        handler: this.registerApiKey.bind(this)
+      },
+
+      // Verify API Key
+      'verify_api_key': {
+        description: 'Verify if a key fingerprint matches the stored fingerprint',
+        parameters: {
+          type: 'object',
+          properties: {
+            service_name: { type: 'string', description: 'Service identifier' },
+            fingerprint: { type: 'string', description: 'SHA256 hash to verify' }
+          },
+          required: ['service_name', 'fingerprint']
+        },
+        handler: this.verifyApiKey.bind(this)
+      },
+
+      // List API Keys
+      'list_api_keys': {
+        description: 'List all registered API keys (fingerprints only)',
+        parameters: {
+          type: 'object',
+          properties: {
+            active_only: { type: 'boolean', description: 'Show only active keys (default: true)' }
+          }
+        },
+        handler: this.listApiKeys.bind(this)
+      },
+
+      // Store Knowledge Base Entry
+      'store_knowledge': {
+        description: 'Store or update entry in AI knowledge base',
+        parameters: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', description: 'Unique identifier' },
+            category: { type: 'string', description: 'Category (e.g., secrets, docs, config)' },
+            title: { type: 'string', description: 'Entry title' },
+            content: { type: 'object', description: 'JSON content' }
+          },
+          required: ['id', 'category', 'title', 'content']
+        },
+        handler: this.storeKnowledge.bind(this)
+      },
+
+      // Query Knowledge Base
+      'query_knowledge': {
+        description: 'Query AI knowledge base by category or search',
+        parameters: {
+          type: 'object',
+          properties: {
+            category: { type: 'string', description: 'Filter by category' },
+            search: { type: 'string', description: 'Search in title' },
+            limit: { type: 'number', description: 'Max results (default 50)' }
+          }
+        },
+        handler: this.queryKnowledge.bind(this)
       }
     };
   }
@@ -464,6 +536,165 @@ export class MCPServer {
         buckets: stats
       };
     }
+  }
+
+  /**
+   * Register or Update API Key Fingerprint
+   */
+  async registerApiKey(args) {
+    const { service_name, fingerprint, env_var_names = '', notes = '' } = args;
+
+    // Validate fingerprint format (64 char hex for SHA256)
+    if (!/^[a-f0-9]{64}$/i.test(fingerprint)) {
+      throw new Error('Invalid fingerprint format. Expected 64-character SHA256 hex string.');
+    }
+
+    const result = await this.queryD1({
+      query: `
+        INSERT INTO api_keys (service_name, key_fingerprint, env_var_names, notes, updated_at)
+        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(service_name) DO UPDATE SET
+          key_fingerprint = excluded.key_fingerprint,
+          env_var_names = excluded.env_var_names,
+          notes = excluded.notes,
+          updated_at = CURRENT_TIMESTAMP
+      `,
+      params: [service_name, fingerprint, env_var_names, notes]
+    });
+
+    return {
+      service_name,
+      fingerprint: fingerprint.substring(0, 16) + '...' + fingerprint.substring(48), // Truncate for display
+      env_vars: env_var_names.split(','),
+      status: 'registered',
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Verify API Key Fingerprint
+   */
+  async verifyApiKey(args) {
+    const { service_name, fingerprint } = args;
+
+    const result = await this.queryD1({
+      query: 'SELECT key_fingerprint, is_active FROM api_keys WHERE service_name = ?',
+      params: [service_name]
+    });
+
+    if (result.length === 0) {
+      return {
+        service_name,
+        verified: false,
+        message: 'Service not found in registry'
+      };
+    }
+
+    const stored = result[0];
+    const matches = stored.key_fingerprint === fingerprint;
+
+    if (matches) {
+      // Update last verified timestamp
+      await this.queryD1({
+        query: 'UPDATE api_keys SET last_verified = CURRENT_TIMESTAMP WHERE service_name = ?',
+        params: [service_name]
+      });
+    }
+
+    return {
+      service_name,
+      verified: matches,
+      is_active: stored.is_active === 1,
+      last_verified: matches ? new Date().toISOString() : null
+    };
+  }
+
+  /**
+   * List API Keys
+   */
+  async listApiKeys(args) {
+    const { active_only = true } = args;
+
+    let query = `
+      SELECT
+        service_name,
+        substr(key_fingerprint, 1, 16) || '...' || substr(key_fingerprint, -16) as fingerprint_preview,
+        env_var_names,
+        is_active,
+        last_verified,
+        notes,
+        created_at,
+        updated_at
+      FROM api_keys
+    `;
+
+    if (active_only) {
+      query += ' WHERE is_active = 1';
+    }
+
+    query += ' ORDER BY service_name';
+
+    return await this.queryD1({ query });
+  }
+
+  /**
+   * Store Knowledge Base Entry
+   */
+  async storeKnowledge(args) {
+    const { id, category, title, content } = args;
+    const timestamp = Math.floor(Date.now() / 1000);
+
+    await this.queryD1({
+      query: `
+        INSERT INTO ai_knowledge_base (id, category, title, content, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          category = excluded.category,
+          title = excluded.title,
+          content = excluded.content,
+          updated_at = ?
+      `,
+      params: [id, category, title, JSON.stringify(content), timestamp, timestamp, timestamp]
+    });
+
+    return {
+      id,
+      category,
+      title,
+      status: 'stored',
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Query Knowledge Base
+   */
+  async queryKnowledge(args) {
+    const { category, search, limit = 50 } = args;
+
+    let query = 'SELECT * FROM ai_knowledge_base WHERE 1=1';
+    const params = [];
+
+    if (category) {
+      query += ' AND category = ?';
+      params.push(category);
+    }
+
+    if (search) {
+      query += ' AND (title LIKE ? OR id LIKE ?)';
+      params.push(`%${search}%`, `%${search}%`);
+    }
+
+    query += ' ORDER BY updated_at DESC LIMIT ?';
+    params.push(limit);
+
+    const results = await this.queryD1({ query, params });
+
+    // Parse JSON content
+    return results.map(row => ({
+      ...row,
+      content: typeof row.content === 'string' ? JSON.parse(row.content) : row.content
+    }));
   }
 
   /**
