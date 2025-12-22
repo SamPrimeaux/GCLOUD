@@ -16,6 +16,8 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 APP_ENV = "production"
 CLOUDFLARE_ACCOUNT_ID = "ede6590ac0d2fb7daf155b35653457b2"
+SUPABASE_URL = "https://qmpghmthbhuumemnahcz.supabase.co"
+SUPABASE_ANON_KEY = "sb_publishable_BQ3iz_92Jh8xvEiMg9WXpg_FNRpy2ZL"
 
 # Migration to remove old Durable Objects
 [[migrations]]
@@ -24,6 +26,10 @@ new_classes = []
 deleted_classes = ["RealtimeServer", "TerminalSession"]
 
 # R2 Buckets
+[[r2_buckets]]
+binding = "ALLINFRASTRUCTURE"
+bucket_name = "allinfrastructure"
+
 [[r2_buckets]]
 binding = "APP_ASSETS"
 bucket_name = "meauxlife-appkit"
