@@ -1,0 +1,14 @@
+# R2 Bucket List
+# Format: bucket-name|BINDING_NAME|Description
+# Lines starting with # are ignored
+
+allinfrastructure|ALLINFRASTRUCTURE|All infrastructure data and configurations
+meauxlife-appkit|APP_ASSETS|Application assets and static files
+inneranimalmedia-email-archive|EMAIL_ARCHIVE|Email archive storage
+samicloudbackups|PERSONAL_BACKUP|Personal backup storage
+autorag-meauxbility-chatbot|R2_AUTORAG|AutoRAG chatbot data
+meauxbility-dashboard|R2_DASHBOARD|Meauxbility dashboard assets
+
+# Add your remaining ~70 buckets below (one per line)
+# Example:
+# my-bucket-name|MY_BUCKET_NAME|Description of bucket
