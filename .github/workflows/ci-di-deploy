@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - 'claude/**'
   workflow_dispatch:
 
 env:
@@ -61,5 +62,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist # change to your build output path; use ./ if static root
-          # If your site is at repo root (no build), set publish_dir: .
+          publish_dir: ./ # Static site at repo root
