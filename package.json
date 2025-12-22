@@ -1,11 +1,11 @@
 {
-  "name": "meaux-os",
-  "version": "1.0.0",
-  "description": "MeauxOS Operations Hub - Unified dashboard for company-wide operations",
+  "name": "gcloudv3",
+  "version": "3.0.0",
+  "description": "GCLOUD - Multi-Tenant SaaS Monorepo Platform",
   "main": "src/index.js",
   "scripts": {
     "dev": "wrangler dev",
-    "build": "echo 'Build complete'",
+    "build": "echo 'Static build - no compilation needed'",
     "deploy": "wrangler deploy",
     "deploy:production": "wrangler deploy --env production",
     "tail": "wrangler tail",
@@ -14,13 +14,14 @@
   "keywords": [
     "cloudflare",
     "workers",
-    "dashboard",
-    "meaux"
+    "saas",
+    "gcloud",
+    "monorepo"
   ],
-  "author": "MeauxAccess",
+  "author": "SamPrimeaux",
   "license": "MIT",
   "devDependencies": {
-    "wrangler": "^3.0.0"
+    "wrangler": "^3.109.0"
   },
   "dependencies": {}
 }
