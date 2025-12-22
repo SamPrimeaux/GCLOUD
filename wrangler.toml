@@ -17,6 +17,12 @@ compatibility_flags = ["nodejs_compat"]
 APP_ENV = "production"
 CLOUDFLARE_ACCOUNT_ID = "ede6590ac0d2fb7daf155b35653457b2"
 
+# Migration to remove old Durable Objects
+[[migrations]]
+tag = "v1"
+new_classes = []
+deleted_classes = ["RealtimeServer"]
+
 # Secrets are managed via Cloudflare Dashboard or wrangler secret put
 # - GCLOUD_GH_TOKEN
 # - CLOUDFLARE_API_TOKEN
