@@ -89,6 +89,7 @@ CREATE INDEX IF NOT EXISTS idx_api_keys_service ON api_keys(service_name);
 
 -- Insert initial R2 buckets from wrangler.toml
 INSERT OR IGNORE INTO r2_buckets (bucket_name, binding_name, description) VALUES
+  ('allinfrastructure', 'ALLINFRASTRUCTURE', 'All infrastructure data and configurations'),
   ('meauxlife-appkit', 'APP_ASSETS', 'Application assets and static files'),
   ('inneranimalmedia-email-archive', 'EMAIL_ARCHIVE', 'Email archive storage'),
   ('samicloudbackups', 'PERSONAL_BACKUP', 'Personal backup storage'),

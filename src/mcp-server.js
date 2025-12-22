@@ -702,6 +702,7 @@ export class MCPServer {
    */
   getBucketBinding(bucketName) {
     const bucketMap = {
+      'allinfrastructure': 'ALLINFRASTRUCTURE',
       'meauxlife-appkit': 'APP_ASSETS',
       'inneranimalmedia-email-archive': 'EMAIL_ARCHIVE',
       'samicloudbackups': 'PERSONAL_BACKUP',

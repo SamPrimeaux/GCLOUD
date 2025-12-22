@@ -61,7 +61,7 @@ export default {
           mcp: true,
           mcp_tools: 13,
           d1: !!env.MEAUXOS_DB,
-          r2_buckets: 5,
+          r2_buckets: 6,
           secret_management: true,
           knowledge_base: true,
           vectorize: !!env.VECTORIZE,
