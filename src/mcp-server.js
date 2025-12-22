@@ -197,6 +197,70 @@ export class MCPServer {
           }
         },
         handler: this.queryKnowledge.bind(this)
+      },
+
+      // SEO: List Pages Needing Optimization
+      'seo_list_pending': {
+        description: 'List SEO pages needing optimization (missing title, description, or low score)',
+        parameters: {
+          type: 'object',
+          properties: {
+            limit: { type: 'number', description: 'Max results (default 20)' }
+          }
+        },
+        handler: this.seoListPending.bind(this)
+      },
+
+      // SEO: Get Page Meta
+      'seo_get_page': {
+        description: 'Get SEO metadata for a specific URL',
+        parameters: {
+          type: 'object',
+          properties: {
+            url: { type: 'string', description: 'Page URL' }
+          },
+          required: ['url']
+        },
+        handler: this.seoGetPage.bind(this)
+      },
+
+      // SEO: Update Page Meta
+      'seo_update_page': {
+        description: 'Update SEO metadata for a page (AI-generated or manual)',
+        parameters: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', description: 'Page ID (optional, will use URL if not provided)' },
+            url: { type: 'string', description: 'Page URL' },
+            title: { type: 'string', description: 'Page title' },
+            description: { type: 'string', description: 'Meta description' },
+            meta_robots: { type: 'string', description: 'Robots meta (default: index,follow)' },
+            canonical_url: { type: 'string', description: 'Canonical URL' },
+            open_graph: { type: 'string', description: 'Open Graph JSON string' },
+            twitter_card: { type: 'string', description: 'Twitter Card JSON string' },
+            structured_data: { type: 'string', description: 'Schema.org JSON-LD string' },
+            tags: { type: 'string', description: 'Comma-separated tags' },
+            seo_score: { type: 'number', description: 'SEO quality score (0-100)' },
+            is_published: { type: 'boolean', description: 'Publish status' }
+          },
+          required: ['url']
+        },
+        handler: this.seoUpdatePage.bind(this)
+      },
+
+      // SEO: Generate Meta with AI
+      'seo_generate_meta': {
+        description: 'Generate SEO metadata using AI (requires GitHub Models or Gemini)',
+        parameters: {
+          type: 'object',
+          properties: {
+            url: { type: 'string', description: 'Page URL' },
+            content: { type: 'string', description: 'Page content to analyze' },
+            brand: { type: 'string', description: 'Brand name (default: Meauxbility)' }
+          },
+          required: ['url', 'content']
+        },
+        handler: this.seoGenerateMeta.bind(this)
       }
     };
   }
@@ -695,6 +759,213 @@ export class MCPServer {
       ...row,
       content: typeof row.content === 'string' ? JSON.parse(row.content) : row.content
     }));
+  }
+
+  /**
+   * SEO: List Pages Needing Optimization
+   */
+  async seoListPending(args) {
+    const { limit = 20 } = args;
+
+    const query = `
+      SELECT id, url, title, description, seo_score, is_published, updated_at
+      FROM seo_meta
+      WHERE is_published = 1
+        AND (title IS NULL OR description IS NULL OR seo_score IS NULL OR seo_score < 70)
+      ORDER BY seo_score ASC, updated_at ASC
+      LIMIT ?
+    `;
+
+    return await this.queryD1({ query, params: [limit] });
+  }
+
+  /**
+   * SEO: Get Page Meta
+   */
+  async seoGetPage(args) {
+    const { url } = args;
+
+    const result = await this.queryD1({
+      query: 'SELECT * FROM seo_meta WHERE url = ?',
+      params: [url]
+    });
+
+    if (result.length === 0) {
+      return { error: 'Page not found', url };
+    }
+
+    const page = result[0];
+
+    // Parse JSON fields
+    if (page.open_graph) page.open_graph = JSON.parse(page.open_graph);
+    if (page.twitter_card) page.twitter_card = JSON.parse(page.twitter_card);
+    if (page.structured_data) page.structured_data = JSON.parse(page.structured_data);
+
+    return page;
+  }
+
+  /**
+   * SEO: Update Page Meta
+   */
+  async seoUpdatePage(args) {
+    const {
+      id,
+      url,
+      title,
+      description,
+      meta_robots = 'index,follow',
+      canonical_url,
+      open_graph,
+      twitter_card,
+      structured_data,
+      tags,
+      seo_score,
+      is_published = true
+    } = args;
+
+    // Generate ID from URL if not provided
+    const pageId = id || url.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+
+    // Calculate SEO score if not provided
+    let score = seo_score;
+    if (score === undefined) {
+      score = this.calculateSEOScore({ title, description, structured_data });
+    }
+
+    await this.queryD1({
+      query: `
+        INSERT INTO seo_meta (
+          id, url, title, description, meta_robots, canonical_url,
+          open_graph, twitter_card, structured_data, tags,
+          seo_score, is_published, source, publish_date
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'mcp', datetime('now'))
+        ON CONFLICT(id) DO UPDATE SET
+          title = excluded.title,
+          description = excluded.description,
+          meta_robots = excluded.meta_robots,
+          canonical_url = excluded.canonical_url,
+          open_graph = excluded.open_graph,
+          twitter_card = excluded.twitter_card,
+          structured_data = excluded.structured_data,
+          tags = excluded.tags,
+          seo_score = excluded.seo_score,
+          is_published = excluded.is_published,
+          updated_at = datetime('now')
+      `,
+      params: [
+        pageId,
+        url,
+        title,
+        description,
+        meta_robots,
+        canonical_url || url,
+        open_graph,
+        twitter_card,
+        structured_data,
+        tags,
+        score,
+        is_published ? 1 : 0
+      ]
+    });
+
+    return {
+      id: pageId,
+      url,
+      title,
+      seo_score: score,
+      status: 'updated',
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  /**
+   * SEO: Generate Meta with AI
+   */
+  async seoGenerateMeta(args) {
+    const { url, content, brand = 'Meauxbility' } = args;
+
+    // Use GitHub Models API or Gemini to generate SEO metadata
+    const prompt = `Generate SEO metadata for this page:
+
+URL: ${url}
+Brand: ${brand}
+
+Content:
+${content.substring(0, 2000)}
+
+Generate:
+1. A compelling SEO title (50-60 characters)
+2. A meta description (150-160 characters)
+3. 5-7 relevant tags (comma-separated)
+4. An SEO quality score (0-100)
+
+Return as JSON with fields: title, description, tags, seo_score`;
+
+    try {
+      // Try GitHub Models first
+      if (this.env.GCLOUD_GH_TOKEN) {
+        const response = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.env.GCLOUD_GH_TOKEN}`
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o',
+            messages: [
+              { role: 'system', content: 'You are an SEO expert. Return only valid JSON.' },
+              { role: 'user', content: prompt }
+            ],
+            response_format: { type: 'json_object' }
+          })
+        });
+
+        const data = await response.json();
+        const generated = JSON.parse(data.choices[0].message.content);
+
+        // Update the page with generated metadata
+        return await this.seoUpdatePage({
+          url,
+          title: generated.title,
+          description: generated.description,
+          tags: generated.tags,
+          seo_score: generated.seo_score,
+          source: 'ai-generated'
+        });
+      }
+
+      throw new Error('No AI service configured (needs GCLOUD_GH_TOKEN or GOOGLE_GEMINI_KEY)');
+    } catch (error) {
+      return {
+        error: error.message,
+        url,
+        status: 'failed'
+      };
+    }
+  }
+
+  /**
+   * Calculate SEO score based on metadata completeness
+   */
+  calculateSEOScore({ title, description, structured_data }) {
+    let score = 0;
+
+    if (title) {
+      score += 30;
+      if (title.length >= 50 && title.length <= 60) score += 10;
+    }
+
+    if (description) {
+      score += 30;
+      if (description.length >= 150 && description.length <= 160) score += 10;
+    }
+
+    if (structured_data) {
+      score += 20;
+    }
+
+    return Math.min(score, 100);
   }
 
   /**

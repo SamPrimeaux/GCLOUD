@@ -59,11 +59,12 @@ export default {
         version: '3.0.0',
         features: {
           mcp: true,
-          mcp_tools: 13,
+          mcp_tools: 17,
           d1: !!env.MEAUXOS_DB,
           r2_buckets: 6,
           secret_management: true,
           knowledge_base: true,
+          seo_management: true,
           vectorize: !!env.VECTORIZE,
           github_models: !!env.GCLOUD_GH_TOKEN
         }
@@ -269,6 +270,82 @@ async function handleAPI(request, env, ctx) {
     }
   }
 
+  // API: SEO - List pages needing optimization
+  if (url.pathname === '/api/seo/pending') {
+    try {
+      const limit = parseInt(url.searchParams.get('limit') || '20');
+      const server = new MCPServer(env);
+      const result = await server.seoListPending({ limit });
+
+      return new Response(JSON.stringify({
+        success: true,
+        data: result
+      }), { headers: corsHeaders });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), { status: 500, headers: corsHeaders });
+    }
+  }
+
+  // API: SEO - Get page metadata
+  if (url.pathname.startsWith('/api/seo/page/') && request.method === 'GET') {
+    try {
+      const pageUrl = decodeURIComponent(url.pathname.split('/api/seo/page/')[1]);
+      const server = new MCPServer(env);
+      const result = await server.seoGetPage({ url: pageUrl });
+
+      return new Response(JSON.stringify({
+        success: true,
+        data: result
+      }), { headers: corsHeaders });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), { status: 500, headers: corsHeaders });
+    }
+  }
+
+  // API: SEO - Update page metadata
+  if (url.pathname === '/api/seo/update' && request.method === 'POST') {
+    try {
+      const data = await request.json();
+      const server = new MCPServer(env);
+      const result = await server.seoUpdatePage(data);
+
+      return new Response(JSON.stringify({
+        success: true,
+        data: result
+      }), { headers: corsHeaders });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), { status: 500, headers: corsHeaders });
+    }
+  }
+
+  // API: SEO - Generate metadata with AI
+  if (url.pathname === '/api/seo/generate' && request.method === 'POST') {
+    try {
+      const { url: pageUrl, content, brand } = await request.json();
+      const server = new MCPServer(env);
+      const result = await server.seoGenerateMeta({ url: pageUrl, content, brand });
+
+      return new Response(JSON.stringify({
+        success: true,
+        data: result
+      }), { headers: corsHeaders });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), { status: 500, headers: corsHeaders });
+    }
+  }
+
   // API: GitHub Models chat
   if (url.pathname === '/api/chat' && request.method === 'POST') {
     try {
@@ -321,6 +398,10 @@ async function handleAPI(request, env, ctx) {
       '/api/secrets/list',
       '/api/knowledge/store (POST)',
       '/api/knowledge/query',
+      '/api/seo/pending',
+      '/api/seo/page/:url',
+      '/api/seo/update (POST)',
+      '/api/seo/generate (POST)',
       '/api/chat'
     ]
   }), {

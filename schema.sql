@@ -77,6 +77,33 @@ CREATE TABLE IF NOT EXISTS api_keys (
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- SEO Meta Management (D1/SQLite version)
+CREATE TABLE IF NOT EXISTS seo_meta (
+  id            TEXT PRIMARY KEY,
+  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at    TEXT NOT NULL DEFAULT (datetime('now')),
+
+  url           TEXT NOT NULL UNIQUE,
+  title         TEXT,
+  description   TEXT,
+  meta_robots   TEXT,
+  canonical_url TEXT,
+
+  open_graph       TEXT,
+  twitter_card     TEXT,
+  structured_data  TEXT,
+
+  language      TEXT,
+  locale        TEXT,
+  tags          TEXT,
+  source        TEXT,
+  notes         TEXT,
+
+  publish_date  TEXT,
+  is_published  INTEGER NOT NULL DEFAULT 0,
+  seo_score     REAL
+);
+
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_r2_objects_bucket_id ON r2_objects(bucket_id);
 CREATE INDEX IF NOT EXISTS idx_r2_objects_key ON r2_objects(object_key);
@@ -86,6 +113,8 @@ CREATE INDEX IF NOT EXISTS idx_mcp_logs_tool ON mcp_tool_logs(tool_name);
 CREATE INDEX IF NOT EXISTS idx_mcp_logs_created ON mcp_tool_logs(created_at);
 CREATE INDEX IF NOT EXISTS idx_ai_kb_category ON ai_knowledge_base(category);
 CREATE INDEX IF NOT EXISTS idx_api_keys_service ON api_keys(service_name);
+CREATE INDEX IF NOT EXISTS idx_seo_meta_url ON seo_meta(url);
+CREATE INDEX IF NOT EXISTS idx_seo_meta_is_published ON seo_meta(is_published);
 
 -- Insert initial R2 buckets from wrangler.toml
 INSERT OR IGNORE INTO r2_buckets (bucket_name, binding_name, description) VALUES
@@ -96,6 +125,16 @@ INSERT OR IGNORE INTO r2_buckets (bucket_name, binding_name, description) VALUES
   ('autorag-meauxbility-chatbot', 'R2_AUTORAG', 'AutoRAG chatbot data'),
   ('meauxbility-dashboard', 'R2_DASHBOARD', 'Meauxbility dashboard assets');
 
+-- Triggers for updated_at
+CREATE TRIGGER IF NOT EXISTS trg_seo_meta_updated_at
+AFTER UPDATE ON seo_meta
+FOR EACH ROW
+BEGIN
+  UPDATE seo_meta
+  SET updated_at = datetime('now')
+  WHERE id = OLD.id;
+END;
+
 -- Insert initial API key registry (fingerprints will be added via MCP tools)
 INSERT OR IGNORE INTO api_keys (service_name, key_fingerprint, env_var_names, notes) VALUES
   ('google-gemini', 'pending', 'GOOGLE_GEMINI_KEY,GEMINI_API_KEY', 'Google Gemini API for AI/ML'),
@@ -103,6 +142,10 @@ INSERT OR IGNORE INTO api_keys (service_name, key_fingerprint, env_var_names, no
   ('supabase', 'pending', 'SUPABASE_SERVICE_ROLE,SUPABASE_URL', 'Supabase database and auth'),
   ('anthropic-claude', 'pending', 'ANTHROPIC_API_KEY,CLAUDE_API_KEY', 'Claude API for AI assistance'),
   ('github', 'pending', 'GITHUB_TOKEN,GH_TOKEN', 'GitHub API for repos and models');
+
+-- Initial SEO entries
+INSERT OR IGNORE INTO seo_meta (id, url, title, description, meta_robots, canonical_url, language, locale, tags, source, is_published, publish_date) VALUES
+  ('meauxbility-home', 'https://meauxbility.org/', 'Meauxbility – More Options. More Access. More Life.', 'Meauxbility is a survivor-led nonprofit helping people with spinal cord injuries access treatments, equipment, and community support.', 'index,follow', 'https://meauxbility.org/', 'en', 'en-US', 'nonprofit,spinal-cord-injury,trauma,recovery,meauxbility', 'meauxos', 1, datetime('now'));
 
 -- Views for easy querying
 CREATE VIEW IF NOT EXISTS v_bucket_stats AS
