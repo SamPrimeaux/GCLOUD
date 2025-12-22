@@ -1,4 +1,8 @@
-# MeauxOS Operations Hub
+# GCLOUD - Multi-Tenant SaaS Monorepo
+
+**Live Demo**: [https://samprimeaux.github.io/GCLOUD/](https://samprimeaux.github.io/GCLOUD/)
+
+GCLOUD is an ever-growing **monorepo SaaS platform** designed to host multiple tenants, branches, and deployment stages. Built with modern cloud infrastructure and AI-powered tools.
 
 Connected repository from [SamPrimeaux/GCLOUD](https://github.com/SamPrimeaux/GCLOUD.git)
 
@@ -71,12 +75,32 @@ The repository includes two GitHub Actions workflows:
 
 View the deployed dashboard: [https://samprimeaux.github.io/GCLOUD/](https://samprimeaux.github.io/GCLOUD/)
 
-## Architecture
+## Tech Stack
 
-- **Frontend**: Static HTML with Tailwind CSS and Three.js
-- **Deployment**: GitHub Pages (dev), Cloudflare Workers (prod)
-- **Database**: Supabase
-- **CI/CD**: GitHub Actions
+### Infrastructure
+- **Cloudflare CI/CD**: Continuous integration and deployment pipeline
+- **Cloudflare R2**: Object storage for multi-tenant assets
+- **Cloudflare Workers**: Edge computing for global performance
+- **GitHub Pages**: Development deployments
+
+### AI & Automation
+- **Google Gemini API**: Advanced AI capabilities
+- **Claude AI**: Natural language processing and code assistance
+- **Cursor**: AI-powered development environment
+- **CloudConvert**: File conversion and processing
+- **Internal MCP**: Model Context Protocol integration
+
+### Features
+- **Multi-Tenant Architecture**: Support for multiple clients/branches
+- **Stage Management**: Dev, staging, and production environments
+- **Chat Boards**: Real-time collaboration
+- **Supabase**: Database and authentication
+- **GitHub Actions**: Automated workflows
+
+### Frontend
+- **Tailwind CSS**: Utility-first styling
+- **Three.js**: 3D graphics and visualizations
+- **Responsive Design**: Mobile-first approach
 
 ## Development
 
