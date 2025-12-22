@@ -1,658 +1,291 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MeauxAccess | Unified Operations Hub</title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Global Impact - Meauxbility Foundation | GCLOUD v3</title>
+    <meta name="description" content="Meauxbility Foundation - Transforming lives through mobility. EIN: 33-4214907 501(c)(3)">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            overscroll-behavior: none;
+        }
+        
+        :root {
+            --meaux-primary: #10b981;
+            --meaux-dark: #059669;
+            --ios-safe-top: env(safe-area-inset-top);
+            --ios-safe-bottom: env(safe-area-inset-bottom);
+        }
+        
+        .mobile-header {
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            background: rgba(255, 255, 255, 0.92);
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
+            padding-top: var(--ios-safe-top);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .ios-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+        
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-count-up {
+            animation: countUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
     
-    <!-- Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <header class="mobile-header fixed top-0 left-0 right-0 z-50">
+        <div class="flex items-center justify-between px-4 h-14">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">M</span>
+                </div>
+                <span class="font-bold text-gray-900 text-lg">Meauxbility</span>
+                <span class="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">GCLOUD v3 ✓</span>
+            </div>
+        </div>
+    </header>
 
-    <!-- Configuration -->
+    <main class="pt-14">
+        <div class="gradient-bg text-white py-12 px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-8">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-2">Global Impact Dashboard</h1>
+                    <p class="text-green-100">Transforming lives through mobility | EIN: 33-4214907</p>
+                    <div class="mt-3 inline-block px-3 py-1 bg-white/20 rounded-full text-sm">
+                        🚀 Deployed via GCLOUD CI/CD Pipeline
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="text-center">
+                        <div class="inline-block p-3 bg-white/20 rounded-2xl mb-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <p class="text-4xl font-bold mb-1 animate-count-up">127</p>
+                        <p class="text-green-100 text-sm">Grants Funded</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="inline-block p-3 bg-white/20 rounded-2xl mb-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <p class="text-4xl font-bold mb-1 animate-count-up">$1.2M</p>
+                        <p class="text-green-100 text-sm">Total Raised</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="inline-block p-3 bg-white/20 rounded-2xl mb-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                        </div>
+                        <p class="text-4xl font-bold mb-1 animate-count-up">2,450</p>
+                        <p class="text-green-100 text-sm">Lives Impacted</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="inline-block p-3 bg-white/20 rounded-2xl mb-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <p class="text-4xl font-bold mb-1 animate-count-up">38</p>
+                        <p class="text-green-100 text-sm">States Reached</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+            <!-- CI/CD Success Banner -->
+            <div class="ios-card bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 p-6">
+                <div class="flex items-center space-x-3 mb-3">
+                    <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">✅ CI/CD Pipeline Working!</h2>
+                        <p class="text-gray-600">GCLOUD v3 successfully deployed via Cloudflare Workers</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div class="bg-white rounded-lg p-3">
+                        <div class="text-xs text-gray-500 mb-1">Worker</div>
+                        <div class="font-semibold text-gray-900">gcloudv3 ✓</div>
+                    </div>
+                    <div class="bg-white rounded-lg p-3">
+                        <div class="text-xs text-gray-500 mb-1">Platform</div>
+                        <div class="font-semibold text-gray-900">Cloudflare Edge ✓</div>
+                    </div>
+                    <div class="bg-white rounded-lg p-3">
+                        <div class="text-xs text-gray-500 mb-1">Status</div>
+                        <div class="font-semibold text-green-600">Live & Deployed ✓</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="ios-card p-5">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Grant Types Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="grantTypesChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="ios-card p-5">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Monthly Funding Trends</h3>
+                    <div class="chart-container">
+                        <canvas id="fundingTrendsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metrics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="ios-card bg-gradient-to-br from-blue-500 to-blue-600 p-5 text-white">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-semibold">Processing Speed</h3>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <p class="text-3xl font-bold mb-1">8.3 days</p>
+                    <p class="text-blue-100 text-sm">Average approval time</p>
+                    <div class="mt-3 pt-3 border-t border-blue-400">
+                        <p class="text-xs text-blue-100">↓ 42% faster than 2023</p>
+                    </div>
+                </div>
+
+                <div class="ios-card bg-gradient-to-br from-green-500 to-green-600 p-5 text-white">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-semibold">Approval Rate</h3>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <p class="text-3xl font-bold mb-1">87%</p>
+                    <p class="text-green-100 text-sm">Applications approved</p>
+                    <div class="mt-3 pt-3 border-t border-green-400">
+                        <p class="text-xs text-green-100">↑ 5% from last year</p>
+                    </div>
+                </div>
+
+                <div class="ios-card bg-gradient-to-br from-purple-500 to-purple-600 p-5 text-white">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-semibold">Average Grant</h3>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <p class="text-3xl font-bold mb-1">$9,450</p>
+                    <p class="text-purple-100 text-sm">Per funded grant</p>
+                    <div class="mt-3 pt-3 border-t border-purple-400">
+                        <p class="text-xs text-purple-100">Range: $500 - $25,000</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Info -->
+            <div class="ios-card p-6 text-center">
+                <p class="text-sm text-gray-600 mb-2">Meauxbility Foundation | 501(c)(3) Non-Profit</p>
+                <p class="text-xs text-gray-500">EIN: 33-4214907 | Transforming lives through mobility solutions</p>
+                <p class="text-xs text-green-600 font-semibold mt-3">✓ Deployed via GCLOUD CI/CD | gcloudv3.meauxbility.workers.dev</p>
+            </div>
+        </div>
+    </main>
+
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    },
-                    colors: {
-                        meaux: {
-                            cyan: '#00D4FF',
-                            blue: '#0077FF',
-                            purple: '#8b5cf6',
-                            pink: '#ec4899',
-                            indigo: '#6366f1',
-                        },
-                        slate: {
-                            850: '#151e2e',
-                            900: '#0f172a',
-                            950: '#020617',
-                        }
-                    },
-                    animation: {
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'float': 'float 6s ease-in-out infinite',
-                        'glow': 'glow 2s ease-in-out infinite alternate',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        },
-                        glow: {
-                            'from': { boxShadow: '0 0 10px -10px #00D4FF' },
-                            'to': { boxShadow: '0 0 20px 5px #00D4FF40' }
+        // Grant Types Chart
+        const grantTypesCtx = document.getElementById('grantTypesChart').getContext('2d');
+        new Chart(grantTypesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Power Chairs', 'Home Modifications', 'Vehicle Modifications', 'Manual Chairs', 'Other Equipment'],
+                datasets: [{
+                    data: [45, 28, 15, 8, 4],
+                    backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            font: { size: 11, family: 'Inter' }
                         }
                     }
                 }
             }
-        }
-    </script>
-
-    <style>
-        /* --- Custom Cursor --- */
-        body {
-            cursor: none; /* Hide default cursor */
-        }
-        .cursor-dot,
-        .cursor-outline {
-            position: fixed;
-            top: 0;
-            left: 0;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            z-index: 9999;
-            pointer-events: none;
-        }
-        .cursor-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #00D4FF;
-        }
-        .cursor-outline {
-            width: 40px;
-            height: 40px;
-            border: 1px solid rgba(0, 212, 255, 0.5);
-            transition: width 0.2s, height 0.2s, background-color 0.2s;
-        }
-        
-        /* Interactive State for Cursor */
-        body.hovering .cursor-outline {
-            width: 60px;
-            height: 60px;
-            background-color: rgba(0, 212, 255, 0.05);
-            border-color: #00D4FF;
-        }
-
-        /* --- Scrollbar --- */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #020617; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #334155; }
-
-        /* --- iOS Glassmorphic Icon Style --- */
-        .glass-icon {
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.01) 100%);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255,255,255,0.2);
-            border-left: 1px solid rgba(255,255,255,0.1);
-            border-right: 1px solid rgba(255,255,255,0.05);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 
-                0 4px 24px -1px rgba(0,0,0,0.2),
-                inset 0 0 12px rgba(255,255,255,0.05);
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        .glass-icon:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 
-                0 20px 40px -5px rgba(0, 212, 255, 0.2),
-                inset 0 0 20px rgba(0, 212, 255, 0.1);
-            border-color: rgba(0, 212, 255, 0.3);
-        }
-
-        .glass-icon svg {
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
-        }
-
-        /* --- Hero Glass Card --- */
-        .hero-glass {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* --- Loader --- */
-        #loader {
-            transition: opacity 0.6s ease-out;
-        }
-    </style>
-</head>
-<body class="bg-slate-950 text-slate-300 font-sans antialiased overflow-hidden selection:bg-meaux-cyan selection:text-white">
-
-    <!-- Custom Cursor Elements -->
-    <div class="cursor-dot" id="cursor-dot"></div>
-    <div class="cursor-outline" id="cursor-outline"></div>
-
-    <!-- Loading Screen -->
-    <div id="loader" class="fixed inset-0 bg-slate-950 z-[100] flex flex-col items-center justify-center">
-        <div class="relative w-16 h-16 mb-4">
-            <div class="absolute inset-0 border-4 border-meaux-cyan/20 rounded-full"></div>
-            <div class="absolute inset-0 border-4 border-meaux-cyan border-t-transparent rounded-full animate-spin"></div>
-        </div>
-        <div class="text-sm font-mono text-meaux-cyan tracking-[0.2em] uppercase animate-pulse">Initializing MeauxOS</div>
-    </div>
-
-    <div class="flex h-screen w-full relative">
-        
-        <!-- Mobile Overlay -->
-        <div id="mobileOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden transition-opacity duration-300 opacity-0"></div>
-
-        <!-- Sidebar (MeauxAccess Nav) -->
-        <aside id="sidenav" class="fixed lg:static inset-y-0 left-0 z-50 w-[280px] bg-slate-900/90 backdrop-blur-xl border-r border-slate-800 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
-            
-            <!-- Logo -->
-            <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800/50">
-                <a href="#" class="flex items-center gap-3 group interactable">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-meaux-cyan to-meaux-blue flex items-center justify-center text-white shadow-lg shadow-meaux-cyan/20">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 18c-4 0-7-3-7-7V8.3l7-3.11 7 3.11V13c0 4-3 7-7 7z"/><path d="M12 6L7 8.5V13c0 2.76 1.79 5.34 5 6 3.21-.66 5-3.24 5-6V8.5L12 6z" opacity="0.5"/></svg>
-                    </div>
-                    <span class="font-bold text-white tracking-tight text-xl">Meaux<span class="text-meaux-cyan">OS</span></span>
-                </a>
-                <button id="closeSidebar" class="lg:hidden text-slate-400 hover:text-white interactable">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-
-            <!-- Links -->
-            <div class="flex-1 overflow-y-auto py-6 px-4 space-y-8">
-                
-                <!-- Core Modules -->
-                <div class="space-y-1">
-                    <h3 class="px-2 text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Core Modules</h3>
-                    <nav class="space-y-1">
-                        <a href="#dashboard" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg bg-meaux-cyan/10 text-meaux-cyan border border-meaux-cyan/10 interactable">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-                            Dashboard
-                        </a>
-                        <a href="#meauxwork" class="group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors interactable">
-                            <div class="flex items-center gap-3">
-                                <svg class="w-5 h-5 group-hover:text-meaux-cyan transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h4v16H4V4zm6 0h4v10h-4V4zm6 0h4v12h-4V4z"/></svg>
-                                MeauxWork
-                            </div>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 group-hover:bg-meaux-cyan/20 group-hover:text-meaux-cyan">24</span>
-                        </a>
-                        <a href="#meauxstats" class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors interactable">
-                            <svg class="w-5 h-5 group-hover:text-meaux-cyan transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zM4 11h4v8H4v-8zm16 8h-4v-6h4v6z"/></svg>
-                            Analytics
-                        </a>
-                        <a href="#meauxteam" class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors interactable">
-                            <svg class="w-5 h-5 group-hover:text-meaux-cyan transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                            Team
-                        </a>
-                    </nav>
-                </div>
-
-                <!-- Content & Media -->
-                <div class="space-y-1">
-                    <h3 class="px-2 text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Content & Media</h3>
-                    <nav class="space-y-1">
-                        <a href="#meauxdoc" class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors interactable">
-                            <svg class="w-5 h-5 group-hover:text-meaux-purple transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-                            Documents
-                        </a>
-                        <a href="#meauxphoto" class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors interactable">
-                            <svg class="w-5 h-5 group-hover:text-meaux-purple transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-                            Photos
-                        </a>
-                        <a href="#meauxmemories" class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors interactable">
-                            <svg class="w-5 h-5 group-hover:text-meaux-purple transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4v12H8V4h12m0-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 9.67l1.69 2.26 2.48-3.1L19 15H9zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z"/></svg>
-                            Gallery
-                        </a>
-                        <a href="#meauxmedia" class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors interactable">
-                            <svg class="w-5 h-5 group-hover:text-meaux-purple transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-                            Media
-                        </a>
-                    </nav>
-                </div>
-
-                <!-- Infrastructure -->
-                <div class="space-y-1">
-                    <h3 class="px-2 text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Infrastructure</h3>
-                    <nav class="space-y-1">
-                        <a href="#meauxcloud" class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors interactable">
-                            <svg class="w-5 h-5 group-hover:text-meaux-cyan transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
-                            Cloud
-                        </a>
-                        <a href="#meauxcad" class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors interactable">
-                            <svg class="w-5 h-5 group-hover:text-meaux-cyan transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M3 3v18h18V3H3zm16 16H5V5h14v14zM11 7h2v2h-2zm0 4h2v6h-2z"/></svg>
-                            CAD Studio
-                        </a>
-                    </nav>
-                </div>
-
-                <!-- Integrations -->
-                <div class="space-y-1">
-                    <h3 class="px-2 text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Integrations</h3>
-                    <nav class="space-y-1">
-                        <a href="#integrations" class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors interactable">
-                            <svg class="w-5 h-5 group-hover:text-pink-400 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-                            Apps
-                        </a>
-                    </nav>
-                </div>
-
-                <!-- Settings -->
-                <div class="space-y-1">
-                    <h3 class="px-2 text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Settings</h3>
-                    <nav class="space-y-1">
-                        <a href="#preferences" class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors interactable">
-                            <svg class="w-5 h-5 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-                            Preferences
-                        </a>
-                    </nav>
-                </div>
-
-            </div>
-
-            <!-- User Footer -->
-            <div class="p-4 border-t border-slate-800 bg-slate-900">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-slate-700 to-slate-600 flex items-center justify-center text-sm font-bold text-white border border-slate-500">
-                        MA
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-white truncate">Admin User</p>
-                        <p class="text-xs text-slate-500 truncate">admin@meauxaccess.com</p>
-                    </div>
-                    <button class="text-slate-400 hover:text-white interactable">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    </button>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-950 relative">
-            
-            <!-- Topbar -->
-            <header class="h-20 border-b border-slate-800 bg-slate-950/80 backdrop-blur-md z-20 flex items-center justify-between px-8">
-                <div class="flex items-center gap-4">
-                    <button id="mobileMenuBtn" class="lg:hidden text-slate-400 hover:text-white interactable">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-                    </button>
-                    <!-- Search -->
-                    <div class="hidden md:flex items-center gap-2 bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-2 w-72 hover:border-slate-700 transition-colors group">
-                        <svg class="w-4 h-4 text-slate-500 group-hover:text-meaux-cyan transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        <input type="text" placeholder="Search modules... (Cmd+K)" class="bg-transparent border-none focus:ring-0 text-sm text-slate-200 placeholder-slate-500 w-full outline-none interactable">
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-6">
-                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="text-xs font-bold text-emerald-500 uppercase tracking-wide">System Online</span>
-                    </div>
-                    <button class="theme-toggle p-2 text-slate-400 hover:text-meaux-cyan transition-colors interactable" id="themeToggle">
-                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-                    </button>
-                </div>
-            </header>
-
-            <!-- Content Scroll Area -->
-            <div class="flex-1 overflow-y-auto relative scroll-smooth">
-                
-                <!-- Ambient Background Glow -->
-                <div class="fixed top-0 left-[280px] w-full h-[500px] bg-gradient-to-b from-meaux-blue/10 to-transparent pointer-events-none z-0"></div>
-
-                <div class="max-w-[1600px] mx-auto p-6 md:p-10 space-y-12 relative z-10">
-                    
-                    <!-- Galaxy Hero Section -->
-                    <div class="hero-glass rounded-3xl p-1 overflow-hidden shadow-2xl shadow-black/50 border border-white/5 relative">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center min-h-[450px] p-8 md:p-12 relative z-10">
-                            <!-- Left: Content -->
-                            <div class="space-y-8 animate-fade-in-up">
-                                <h1 class="text-5xl md:text-6xl font-bold leading-tight text-white tracking-tight">
-                                    Company-Wide <br>
-                                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-meaux-cyan to-meaux-purple">Operations Hub</span>
-                                </h1>
-                                <p class="text-slate-400 text-lg leading-relaxed max-w-lg">
-                                    MeauxOS brings your entire workflow into one powerful platform. From project management to analytics, everything you need to collaborate and thrive.
-                                </p>
-                                <div class="flex flex-wrap gap-4">
-                                    <button class="px-8 py-4 rounded-xl bg-gradient-to-r from-meaux-cyan to-meaux-blue text-white font-bold shadow-lg shadow-meaux-cyan/25 hover:shadow-meaux-cyan/40 hover:scale-105 transition-all interactable">
-                                        Launch Dashboard
-                                    </button>
-                                    <button class="px-8 py-4 rounded-xl bg-slate-800/50 border border-white/10 text-white font-bold hover:bg-white/5 transition-all interactable">
-                                        Documentation
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Right: Three.js Galaxy Engine -->
-                            <div class="h-[400px] w-full relative">
-                                <div id="canvas-container" class="w-full h-full absolute inset-0 rounded-2xl overflow-hidden"></div>
-                                
-                                <!-- Floating Data Widget (Decorative) -->
-                                <div class="absolute bottom-6 right-6 bg-slate-900/80 backdrop-blur-md p-4 rounded-xl border border-white/10 flex items-center gap-4 animate-float">
-                                    <div class="w-10 h-10 rounded-full bg-meaux-cyan/20 flex items-center justify-center text-meaux-cyan">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                                    </div>
-                                    <div>
-                                        <div class="text-xs text-slate-400 uppercase tracking-wider">Network Load</div>
-                                        <div class="text-lg font-mono font-bold text-white">98.4%</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Options Grid Section -->
-                    <section>
-                        <div class="flex items-end justify-between mb-8">
-                            <div>
-                                <h2 class="text-2xl font-bold text-white mb-2">Meaux Modules</h2>
-                                <p class="text-slate-400">Complete suite of tools for your organization</p>
-                            </div>
-                        </div>
-
-                        <!-- 1:1 Glassmorphic Icons Grid -->
-                        <div id="optionsGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-                            <!-- Injected via JS -->
-                        </div>
-                    </section>
-
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <script>
-        // --- 1. System Config & Data (Extended Plan) ---
-        const icons = {
-            dashboard: '<path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>',
-            work: '<path d="M4 4h4v16H4V4zm6 0h4v10h-4V4zm6 0h4v12h-4V4z"/>',
-            stats: '<path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zM4 11h4v8H4v-8zm16 8h-4v-6h4v6z"/>',
-            team: '<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>',
-            doc: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>',
-            photo: '<path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>',
-            gallery: '<path d="M20 4v12H8V4h12m0-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 9.67l1.69 2.26 2.48-3.1L19 15H9zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z"/>',
-            media: '<path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>',
-            cloud: '<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>',
-            cad: '<path d="M3 3v18h18V3H3zm16 16H5V5h14v14zM11 7h2v2h-2zm0 4h2v6h-2z"/>',
-            app: '<path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/>',
-            ai: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>',
-            code: '<path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>',
-            payment: '<path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>',
-            auth: '<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>',
-            integration: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>'
-        };
-
-        const modules = [
-            { icon: 'dashboard', code: 'MX-WK', name: 'MeauxWork', desc: 'Project overview', color: 'from-blue-400 to-blue-600' },
-            { icon: 'stats', code: 'MX-ST', name: 'MeauxStats', desc: 'Real-time metrics', color: 'from-emerald-400 to-emerald-600' },
-            { icon: 'team', code: 'MX-TM', name: 'MeauxTeam', desc: 'Team portfolio', color: 'from-violet-400 to-violet-600' },
-            { icon: 'doc', code: 'MX-DC', name: 'MeauxDOC', desc: 'Document storage', color: 'from-amber-400 to-amber-600' },
-            { icon: 'photo', code: 'MX-PH', name: 'MeauxPHOTO', desc: 'Editing studio', color: 'from-pink-400 to-pink-600' },
-            { icon: 'gallery', code: 'MX-MM', name: 'MeauxMemories', desc: 'Asset library', color: 'from-rose-400 to-rose-600' },
-            { icon: 'media', code: 'MX-MD', name: 'MeauxMedia', desc: 'Social hub', color: 'from-fuchsia-400 to-fuchsia-600' },
-            { icon: 'cloud', code: 'MX-CL', name: 'MeauxCloud', desc: 'Unified storage', color: 'from-cyan-400 to-cyan-600' },
-            { icon: 'cad', code: 'MX-CD', name: 'MeauxCAD', desc: '3D design', color: 'from-orange-400 to-orange-600' },
-            { icon: 'app', code: 'FA', name: 'Fullstack App', desc: 'Application', color: 'from-indigo-400 to-indigo-600' },
-            { icon: 'app', code: 'SA', name: 'SaaS Platform', desc: 'Subscription', color: 'from-sky-400 to-sky-600' },
-            { icon: 'payment', code: 'EC', name: 'Ecommerce', desc: 'Store solution', color: 'from-green-400 to-green-600' },
-            { icon: 'ai', code: 'AI', name: 'AI Integration', desc: 'NLP Features', color: 'from-purple-400 to-purple-600' },
-            { icon: 'stats', code: 'DS', name: 'Dash Builder', desc: 'Custom view', color: 'from-teal-400 to-teal-600' },
-            { icon: 'auth', code: 'AU', name: 'Authentication', desc: 'Secure login', color: 'from-red-400 to-red-600' },
-            { icon: 'payment', code: 'PY', name: 'Payments', desc: 'Billing', color: 'from-yellow-400 to-yellow-600' },
-            { icon: 'integration', code: 'FG', name: 'Figma Sync', desc: 'Design sync', color: 'from-purple-500 to-pink-500' },
-            { icon: 'integration', code: 'SP', name: 'Spline 3D', desc: 'Real-time 3D', color: 'from-pink-500 to-rose-500' },
-            { icon: 'ai', code: 'MY', name: 'Meshy.ai', desc: 'AI Models', color: 'from-blue-500 to-cyan-500' },
-            { icon: 'integration', code: 'AD', name: 'Adobe Suite', desc: 'Creative Cloud', color: 'from-red-500 to-orange-500' },
-            { icon: 'media', code: 'CC', name: 'CapCut Pro', desc: 'Video Edit', color: 'from-slate-100 to-slate-400' },
-            { icon: 'code', code: 'CI', name: 'CI/CD', desc: 'Pipeline', color: 'from-gray-400 to-gray-600' },
-            { icon: 'cloud', code: 'DK', name: 'Docker', desc: 'Containers', color: 'from-blue-400 to-sky-400' },
-            { icon: 'auth', code: 'SE', name: 'Security', desc: 'Auditing', color: 'from-slate-500 to-slate-700' },
-        ];
-
-        // --- 2. Render Functions ---
-        function renderModules() {
-            const grid = document.getElementById('optionsGrid');
-            grid.innerHTML = modules.map(mod => `
-                <div class="group flex flex-col items-center gap-3 cursor-pointer interactable" onclick="console.log('Launch ${mod.code}')">
-                    <div class="w-20 h-20 rounded-[22px] glass-icon flex items-center justify-center relative overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-br ${mod.color} opacity-20 group-hover:opacity-30 transition-opacity"></div>
-                        <svg class="w-10 h-10 text-white relative z-10" fill="currentColor" viewBox="0 0 24 24">
-                            ${icons[mod.icon] || icons.app}
-                        </svg>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-sm font-medium text-white group-hover:text-meaux-cyan transition-colors">${mod.name}</div>
-                        <div class="text-[10px] text-slate-500 font-mono mt-0.5">/${mod.code}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // --- 3. Three.js Galaxy Hero Engine ---
-        function initGalaxy() {
-            const container = document.getElementById('canvas-container');
-            const scene = new THREE.Scene();
-            
-            // Fog for depth
-            scene.fog = new THREE.FogExp2(0x0f172a, 0.04); // Slate-900 match
-
-            const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.z = 25;
-            camera.position.y = 0;
-
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            container.appendChild(renderer.domElement);
-
-            const galaxyGroup = new THREE.Group();
-            scene.add(galaxyGroup);
-
-            // UI Texture Generator
-            function createUITexture() {
-                const canvas = document.createElement('canvas');
-                canvas.width = 256;
-                canvas.height = 340;
-                const ctx = canvas.getContext('2d');
-                
-                // Card Body
-                ctx.fillStyle = 'rgba(0, 212, 255, 0.05)'; 
-                ctx.fillRect(0, 0, 256, 340);
-                
-                // Border
-                ctx.strokeStyle = 'rgba(0, 212, 255, 0.4)'; 
-                ctx.lineWidth = 4;
-                ctx.strokeRect(0, 0, 256, 340);
-
-                // UI Elements
-                ctx.fillStyle = 'rgba(0, 212, 255, 0.2)';
-                ctx.fillRect(20, 20, 100, 30);
-                
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-                ctx.fillRect(20, 70, 216, 15);
-                ctx.fillRect(20, 100, 180, 15);
-                ctx.fillRect(20, 130, 216, 15);
-                
-                // Charts
-                ctx.fillStyle = 'rgba(99, 102, 241, 0.4)';
-                ctx.fillRect(20, 240, 40, 80);
-                ctx.fillStyle = 'rgba(236, 72, 153, 0.4)';
-                ctx.fillRect(80, 200, 40, 120);
-                ctx.fillStyle = 'rgba(0, 212, 255, 0.4)';
-                ctx.fillRect(140, 260, 40, 60);
-
-                return new THREE.CanvasTexture(canvas);
-            }
-
-            // --- Scene Elements ---
-            
-            // 1. Stars
-            const starGeo = new THREE.BufferGeometry();
-            const starCount = 2000;
-            const starPos = new Float32Array(starCount * 3);
-            for(let i=0; i<starCount; i++) {
-                starPos[i*3] = (Math.random() - 0.5) * 100;
-                starPos[i*3+1] = (Math.random() - 0.5) * 100;
-                starPos[i*3+2] = (Math.random() - 0.5) * 50;
-            }
-            starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-            const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.15, transparent: true, opacity: 0.8 });
-            const stars = new THREE.Points(starGeo, starMat);
-            galaxyGroup.add(stars);
-
-            // 2. Falling UI Cards
-            const uiCards = [];
-            const uiTex = createUITexture();
-            const cardGeo = new THREE.PlaneGeometry(2, 2.8);
-            const cardMat = new THREE.MeshBasicMaterial({ 
-                map: uiTex, 
-                transparent: true, 
-                opacity: 0.6, 
-                side: THREE.DoubleSide,
-                blending: THREE.AdditiveBlending 
-            });
-
-            for(let i=0; i<30; i++) {
-                const card = new THREE.Mesh(cardGeo, cardMat);
-                card.position.set(
-                    (Math.random() - 0.5) * 35,
-                    (Math.random() - 0.5) * 35,
-                    (Math.random() - 0.5) * 20
-                );
-                card.rotation.set(Math.random() * 0.5, Math.random() * 0.5, 0);
-                card.userData = { 
-                    speed: 0.02 + Math.random() * 0.04,
-                    rotSpeed: (Math.random() - 0.5) * 0.005 
-                };
-                galaxyGroup.add(card);
-                uiCards.push(card);
-            }
-
-            // 3. Background Grid Wireframe
-            const coreGeo = new THREE.IcosahedronGeometry(12, 1);
-            const coreMat = new THREE.MeshBasicMaterial({ color: 0x00D4FF, wireframe: true, transparent: true, opacity: 0.03 });
-            const core = new THREE.Mesh(coreGeo, coreMat);
-            galaxyGroup.add(core);
-
-            // --- Animation ---
-            let mouseX = 0;
-            let mouseY = 0;
-            
-            container.addEventListener('mousemove', (e) => {
-                const rect = container.getBoundingClientRect();
-                mouseX = ((e.clientX - rect.left) - rect.width/2) * 0.002;
-                mouseY = ((e.clientY - rect.top) - rect.height/2) * 0.002;
-            });
-
-            function animate() {
-                requestAnimationFrame(animate);
-
-                // Rotate Galaxy
-                stars.rotation.y += 0.0005;
-                core.rotation.y -= 0.001;
-                core.rotation.x -= 0.0005;
-
-                // Falling Cards Logic
-                uiCards.forEach(card => {
-                    card.position.y -= card.userData.speed;
-                    card.rotation.y += card.userData.rotSpeed;
-                    if(card.position.y < -15) {
-                        card.position.y = 15;
-                        card.position.x = (Math.random() - 0.5) * 35;
-                        card.position.z = (Math.random() - 0.5) * 20;
-                    }
-                });
-
-                // Parallax
-                galaxyGroup.rotation.x += 0.05 * (mouseY * 0.5 - galaxyGroup.rotation.x);
-                galaxyGroup.rotation.y += 0.05 * (mouseX * 0.5 - galaxyGroup.rotation.y);
-
-                renderer.render(scene, camera);
-            }
-            animate();
-
-            // Resize
-            window.addEventListener('resize', () => {
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(container.clientWidth, container.clientHeight);
-            });
-        }
-
-        // --- 4. Magnetic Custom Cursor ---
-        function initCursor() {
-            const dot = document.getElementById('cursor-dot');
-            const outline = document.getElementById('cursor-outline');
-            
-            window.addEventListener('mousemove', (e) => {
-                const posX = e.clientX;
-                const posY = e.clientY;
-
-                // Dot follows instantly
-                dot.style.left = `${posX}px`;
-                dot.style.top = `${posY}px`;
-
-                // Outline follows with slight delay (animation in CSS)
-                outline.animate({
-                    left: `${posX}px`,
-                    top: `${posY}px`
-                }, { duration: 500, fill: "forwards" });
-            });
-
-            // Hover effects
-            const interactables = document.querySelectorAll('.interactable');
-            interactables.forEach(el => {
-                el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
-                el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
-            });
-        }
-
-        // --- 5. Initialization ---
-        window.addEventListener('DOMContentLoaded', () => {
-            renderModules();
-            initGalaxy();
-            initCursor();
-
-            // Sidenav Toggles
-            const sidenav = document.getElementById('sidenav');
-            const overlay = document.getElementById('mobileOverlay');
-            function toggleMenu() {
-                const closed = sidenav.classList.contains('-translate-x-full');
-                closed ? sidenav.classList.remove('-translate-x-full') : sidenav.classList.add('-translate-x-full');
-                closed ? overlay.classList.remove('hidden') : setTimeout(()=>overlay.classList.add('hidden'), 300);
-                if(closed) setTimeout(()=>overlay.classList.remove('opacity-0'), 10);
-                else overlay.classList.add('opacity-0');
-            }
-            document.getElementById('mobileMenuBtn').addEventListener('click', toggleMenu);
-            document.getElementById('closeSidebar').addEventListener('click', toggleMenu);
-            overlay.addEventListener('click', toggleMenu);
-
-            // Remove Loader
-            setTimeout(() => {
-                const loader = document.getElementById('loader');
-                loader.style.opacity = '0';
-                setTimeout(() => loader.remove(), 600);
-            }, 1000);
         });
+
+        // Funding Trends Chart
+        const fundingTrendsCtx = document.getElementById('fundingTrendsChart').getContext('2d');
+        new Chart(fundingTrendsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Grants Funded',
+                    data: [12, 15, 18, 14, 22, 19, 25, 21, 28, 24, 31, 27],
+                    backgroundColor: '#10b981',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        console.log('✅ GCLOUD v3 - Meauxbility Foundation Dashboard Loaded Successfully!');
+        console.log('📊 CI/CD Pipeline: WORKING');
+        console.log('🚀 Deployed to: gcloudv3.meauxbility.workers.dev');
     </script>
 </body>
 </html>
