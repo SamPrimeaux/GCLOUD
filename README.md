@@ -51,6 +51,7 @@ cp .env.example .env
 |----------|-------------|
 | `INTERNAL_SYNC_TOKEN` | Any secure random string for internal API authentication |
 | `MEAUXBILITY_GH_DASHBOARD` | GitHub Personal Access Token for dashboard integration |
+| `GITHUB_MODELS_TOKEN` | GitHub Models API token for AI model access (GPT-4, etc.) |
 
 ### 3. GitHub Secrets Configuration
 
@@ -84,6 +85,7 @@ View the deployed dashboard: [https://samprimeaux.github.io/GCLOUD/](https://sam
 - **GitHub Pages**: Development deployments
 
 ### AI & Automation
+- **GitHub Models**: Free access to GPT-4, GPT-4o, Llama 3.1, and more AI models
 - **Google Gemini API**: Advanced AI capabilities
 - **Claude AI**: Natural language processing and code assistance
 - **Cursor**: AI-powered development environment
