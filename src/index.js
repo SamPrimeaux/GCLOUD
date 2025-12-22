@@ -4,6 +4,7 @@
  */
 
 import { handleMCPRequest, MCPServer } from './mcp-server.js';
+import { HTML_CONTENT } from './html-content.js';
 
 // Serve index.html from R2 or fallback to inline
 async function getIndexHTML(env) {
@@ -19,8 +20,8 @@ async function getIndexHTML(env) {
     console.error('Failed to fetch index.html from R2:', error);
   }
 
-  // Fallback to inline HTML
-  return `<!-- Static HTML will be served from R2 or deployed build -->`;
+  // Fallback to inline HTML content
+  return HTML_CONTENT;
 }
 
 export default {
