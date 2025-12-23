@@ -1,5 +1,5 @@
 -- List All R2 Buckets with Statistics
--- Run with: npx wrangler d1 execute MEAUXOS_DB --local --file=scripts/list-all-buckets.sql
+-- Run with: npx wrangler d1 execute meauxos --local --file=scripts/list-all-buckets.sql
 
 SELECT
   bucket_name,

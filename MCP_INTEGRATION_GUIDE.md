@@ -33,7 +33,7 @@ GCLOUD v3 now includes a **full MCP server** that enables AI assistants to query
 │  │ (13 Tools)   │       │  POST /mcp          │    │
 │  └──────┬───────┘       └─────────────────────┘    │
 │         │                                            │
-│         ├─→ D1 Database (MEAUXOS_DB)                │
+│         ├─→ D1 Database (DB)                        │
 │         │   • r2_buckets (registry)                 │
 │         │   • r2_objects (76+ buckets indexed)      │
 │         │   • mcp_tool_logs                         │
@@ -467,7 +467,7 @@ SELECT * FROM v_recent_objects;
 ### 1. Initialize Remote D1 Database
 
 ```bash
-npx wrangler d1 execute MEAUXOS_DB --remote --file=schema.sql
+npx wrangler d1 execute meauxos --remote --file=schema.sql
 ```
 
 ### 2. Sync Your R2 Buckets

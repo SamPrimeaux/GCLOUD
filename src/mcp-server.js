@@ -21,7 +21,7 @@ export class MCPServer {
     return {
       // D1 SQL Query Tool
       'query_d1': {
-        description: 'Execute SQL queries on the D1 database (MEAUXOS_DB)',
+        description: 'Execute SQL queries on the D1 database (DB)',
         parameters: {
           type: 'object',
           properties: {
@@ -261,6 +261,22 @@ export class MCPServer {
           required: ['url', 'content']
         },
         handler: this.seoGenerateMeta.bind(this)
+      },
+
+      // AutoRAG: Ingest docs from R2 into D1 knowledge base
+      'autorag_ingest_r2': {
+        description: 'Ingest text-like documents from an R2 bucket into the D1 ai_knowledge_base for retrieval (uses R2 bindings, no public access required).',
+        parameters: {
+          type: 'object',
+          properties: {
+            bucket_name: { type: 'string', description: 'R2 bucket name to ingest (e.g., allinfrastructure, autorag-meauxbility-chatbot)' },
+            prefix: { type: 'string', description: 'Optional prefix filter' },
+            limit: { type: 'number', description: 'Max objects to scan (default 200)' },
+            max_bytes: { type: 'number', description: 'Skip objects larger than this (default 1000000)' }
+          },
+          required: ['bucket_name']
+        },
+        handler: this.autoragIngestR2.bind(this)
       }
     };
   }
@@ -351,13 +367,13 @@ export class MCPServer {
   async queryD1(args) {
     const { query, params = [] } = args;
 
-    if (!this.env.MEAUXOS_DB) {
+    if (!this.env.DB) {
       throw new Error('D1 database not configured');
     }
 
     const stmt = params.length > 0
-      ? this.env.MEAUXOS_DB.prepare(query).bind(...params)
-      : this.env.MEAUXOS_DB.prepare(query);
+      ? this.env.DB.prepare(query).bind(...params)
+      : this.env.DB.prepare(query);
 
     const result = await stmt.all();
     return result.results;
@@ -982,6 +998,113 @@ Return as JSON with fields: title, description, tags, seo_score`;
     };
 
     return bucketMap[bucketName];
+  }
+
+  /**
+   * AutoRAG: ingest R2 documents into ai_knowledge_base
+   * Stores one row per object with id "r2:<bucket>:<key>" and JSON content.
+   */
+  async autoragIngestR2(args) {
+    const { bucket_name, prefix = '', limit = 200, max_bytes = 1_000_000 } = args;
+
+    const binding = this.getBucketBinding(bucket_name);
+    if (!binding) throw new Error(`Bucket not found or not bound: ${bucket_name}`);
+    const bucket = this.env[binding];
+    if (!bucket) throw new Error(`R2 binding missing: ${binding}`);
+
+    // List objects
+    const listed = await bucket.list({ prefix, limit: Math.min(Number(limit) || 200, 1000) });
+    const objects = listed.objects || [];
+    const now = Math.floor(Date.now() / 1000);
+
+    let scanned = 0;
+    let ingested = 0;
+    let skipped = 0;
+    const errors = [];
+
+    for (const obj of objects) {
+      scanned += 1;
+      try {
+        // size gate
+        if (obj.size != null && obj.size > (Number(max_bytes) || 1_000_000)) {
+          skipped += 1;
+          continue;
+        }
+
+        // basic extension allowlist (text-ish)
+        const key = obj.key || '';
+        const ext = key.includes('.') ? key.split('.').pop().toLowerCase() : '';
+        const allowExt = new Set(['txt', 'md', 'markdown', 'json', 'yaml', 'yml', 'csv', 'log', 'sql', 'html']);
+        if (ext && !allowExt.has(ext)) {
+          // If no extension, still attempt (often docs are extensionless)
+          if (key.includes('.')) {
+            skipped += 1;
+            continue;
+          }
+        }
+
+        const object = await bucket.get(key);
+        if (!object) {
+          skipped += 1;
+          continue;
+        }
+
+        const text = await object.text();
+        const trimmed = (text || '').trim();
+        if (!trimmed) {
+          skipped += 1;
+          continue;
+        }
+
+        // Cap stored text to keep D1 reasonable (you can store the raw in R2)
+        const maxChars = 50_000;
+        const storedText = trimmed.length > maxChars ? `${trimmed.slice(0, maxChars)}\n\n[TRUNCATED]` : trimmed;
+
+        const id = `r2:${bucket_name}:${key}`;
+        const category = bucket_name === 'allinfrastructure' ? 'autorag-allinfrastructure' : 'autorag-corpus';
+        const title = key;
+        const content = {
+          source: 'r2',
+          bucket_name,
+          binding,
+          key,
+          etag: obj.etag,
+          size_bytes: obj.size,
+          uploaded: obj.uploaded ? obj.uploaded.toISOString?.() || obj.uploaded : null,
+          http_metadata: object.httpMetadata || null,
+          text: storedText
+        };
+
+        await this.queryD1({
+          query: `
+            INSERT INTO ai_knowledge_base (id, category, title, content, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET
+              category = excluded.category,
+              title = excluded.title,
+              content = excluded.content,
+              updated_at = excluded.updated_at
+          `,
+          params: [id, category, title, JSON.stringify(content), now, now]
+        });
+
+        ingested += 1;
+      } catch (e) {
+        errors.push({ key: obj.key, error: e.message });
+      }
+    }
+
+    return {
+      bucket_name,
+      prefix,
+      scanned,
+      ingested,
+      skipped,
+      truncated: listed.truncated || false,
+      cursor: listed.cursor || null,
+      errors: errors.slice(0, 20),
+      timestamp: new Date().toISOString()
+    };
   }
 
   /**

@@ -11,8 +11,8 @@ Your repository is now fully set up with:
 
 ## 🔐 Your Cloudflare Credentials
 
-**Account ID**: `ede6590ac0d2fb7daf155b35653457b2`
-**API Token**: `cCvHyeJ9xLgfFGgV-L_5xhPz-_wbafF5r0JrtbOF`
+**Account ID**: `<your_cf_account_id>`
+**API Token**: `<your_cloudflare_api_token>`
 
 ## 📋 Next Steps - GitHub Secrets Setup
 
@@ -25,8 +25,8 @@ You need to add secrets to GitHub for CI/CD workflows to work:
 
 | Secret Name | Value | Purpose |
 |------------|-------|---------|
-| `CLOUDFLARE_API_TOKEN` | `cCvHyeJ9xLgfFGgV-L_5xhPz-_wbafF5r0JrtbOF` | Cloudflare deployment |
-| `CF_ACCOUNT_ID` | `ede6590ac0d2fb7daf155b35653457b2` | Your Cloudflare account |
+| `CLOUDFLARE_API_TOKEN` | `<your_cloudflare_api_token>` | Cloudflare deployment |
+| `CF_ACCOUNT_ID` | `<your_cf_account_id>` | Your Cloudflare account |
 | `MEAUXBILITY_GH_DASHBOARD` | (your GitHub PAT token) | GitHub integration |
 
 **Optional** (if using Supabase):
@@ -80,8 +80,7 @@ npm run deploy
 ├── src/
 │   └── index.js           # Cloudflare Worker entry point
 ├── .github/workflows/
-│   ├── ci-di-deploy       # Full CI/CD pipeline
-│   └── deploy-github-pages.yml  # GitHub Pages deployment
+│   └── ci-cd.yml          # Checks + deploy Pages + deploy Worker
 ├── wrangler.toml          # Cloudflare Workers config
 ├── package.json           # NPM scripts and dependencies
 ├── .env                   # Local environment variables (not committed)
@@ -92,7 +91,7 @@ npm run deploy
 
 ## 🔗 Useful Links
 
-- **Cloudflare Dashboard**: https://dash.cloudflare.com/ede6590ac0d2fb7daf155b35653457b2/workers
+- **Cloudflare Dashboard**: https://dash.cloudflare.com/<your_cf_account_id>/workers
 - **GitHub Actions**: https://github.com/InnerAnimal/app/actions
 - **Live Demo**: https://samprimeaux.github.io/GCLOUD/
 

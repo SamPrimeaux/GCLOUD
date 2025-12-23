@@ -67,10 +67,9 @@ For GitHub Actions workflows, add these secrets to your repository:
 
 ### 4. Deployment
 
-The repository includes two GitHub Actions workflows:
+The repository includes one GitHub Actions workflow:
 
-1. **`deploy-github-pages.yml`** - Deploys static site to GitHub Pages
-2. **`ci-di-deploy`** - Full CI/CD pipeline with Cloudflare Workers deployment
+1. **`ci-cd.yml`** - Runs checks on PRs, and deploys GitHub Pages + Cloudflare Worker on `main`
 
 ## Live Site
 
