@@ -5,6 +5,7 @@
 
 import { handleMCPRequest, MCPServer } from './mcp-server.js';
 import { HTML_CONTENT } from './html-content.js';
+import { SupabaseSync } from './supabase-sync.js';
 
 // Serve index.html from R2 or fallback to inline
 async function getIndexHTML(env) {
@@ -100,6 +101,87 @@ async function handleAPI(request, env, ctx) {
     'Access-Control-Allow-Origin': '*'
   };
 
+  const json = (obj, init = {}) =>
+    new Response(JSON.stringify(obj), { headers: { ...corsHeaders, ...(init.headers || {}) }, status: init.status || 200 });
+
+  const requireInternalAuth = () => {
+    if (!env.INTERNAL_SYNC_TOKEN) {
+      return { ok: false, status: 503, body: { success: false, error: 'Sync/auth not configured (set INTERNAL_SYNC_TOKEN)' } };
+    }
+    const auth = request.headers.get('authorization') || '';
+    const expected = `Bearer ${env.INTERNAL_SYNC_TOKEN}`;
+    if (auth !== expected) {
+      return { ok: false, status: 403, body: { success: false, error: 'Forbidden' } };
+    }
+    return { ok: true };
+  };
+
+  // --------------------------------------------------------------------------
+  // Sync endpoints (protected)
+  // --------------------------------------------------------------------------
+
+  if (url.pathname === '/api/sync/d1-to-supabase' && request.method === 'POST') {
+    const auth = requireInternalAuth();
+    if (!auth.ok) return json(auth.body, { status: auth.status });
+
+    try {
+      const { table, options = {} } = await request.json();
+      const sync = new SupabaseSync(env);
+      const result = await sync.syncD1ToSupabase(table, options);
+      return json(result);
+    } catch (error) {
+      return json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  if (url.pathname === '/api/sync/supabase-to-d1' && request.method === 'POST') {
+    const auth = requireInternalAuth();
+    if (!auth.ok) return json(auth.body, { status: auth.status });
+
+    try {
+      const { table, options = {} } = await request.json();
+      const sync = new SupabaseSync(env);
+      const result = await sync.syncSupabaseToD1(table, options);
+      return json(result);
+    } catch (error) {
+      return json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  if (url.pathname === '/api/sync/all' && request.method === 'POST') {
+    const auth = requireInternalAuth();
+    if (!auth.ok) return json(auth.body, { status: auth.status });
+
+    try {
+      const body = await request.json().catch(() => ({}));
+      const sync = new SupabaseSync(env);
+      const result = await sync.syncAll(body || {});
+      return json(result);
+    } catch (error) {
+      return json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  if (url.pathname === '/api/sync/status' && request.method === 'GET') {
+    const auth = requireInternalAuth();
+    if (!auth.ok) return json(auth.body, { status: auth.status });
+
+    try {
+      if (!env.DB) throw new Error('D1 not configured');
+      const result = await env.DB.prepare(
+        `
+        SELECT table_name, last_sync, record_count, sync_status, error_message, created_at
+        FROM supabase_sync
+        ORDER BY created_at DESC
+        LIMIT 20
+        `
+      ).all();
+      return json({ success: true, data: result.results || [] });
+    } catch (error) {
+      return json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
   // API: Verify endpoint
   if (url.pathname === '/api/verify') {
     return new Response(JSON.stringify({
@@ -115,6 +197,249 @@ async function handleAPI(request, env, ctx) {
     const server = new MCPServer(env);
     const tools = server.listTools();
     return new Response(JSON.stringify(tools), { headers: corsHeaders });
+  }
+
+  // --------------------------------------------------------------------------
+  // Command Center dashboard APIs (read-only)
+  // --------------------------------------------------------------------------
+
+  if (url.pathname === '/api/dashboard/overview' && request.method === 'GET') {
+    try {
+      if (!env.DB) throw new Error('D1 database not configured');
+
+      // Cross-system overview (safe even if some tables empty)
+      const counts = await env.DB.prepare(
+        `
+        SELECT 'Grants' as metric, (SELECT COUNT(*) FROM grant_applications) as value
+        UNION ALL
+        SELECT 'Pending Grants', (SELECT COUNT(*) FROM grant_applications WHERE status = 'pending')
+        UNION ALL
+        SELECT 'Active Projects', (SELECT COUNT(*) FROM projects WHERE status = 'active')
+        UNION ALL
+        SELECT 'Team Members', (SELECT COUNT(DISTINCT user_id) FROM team_members WHERE is_active = 1)
+        UNION ALL
+        SELECT 'R2 Buckets', (SELECT COUNT(*) FROM r2_buckets)
+        UNION ALL
+        SELECT 'Total R2 Objects', (SELECT COALESCE(SUM(object_count), 0) FROM r2_buckets)
+        UNION ALL
+        SELECT 'API Keys', (SELECT COUNT(*) FROM api_keys WHERE is_active = 1)
+        UNION ALL
+        SELECT 'SEO Pages', (SELECT COUNT(*) FROM seo_meta WHERE is_published = 1)
+        `
+      ).all();
+
+      // Lightweight panels
+      const pendingGrants = await env.DB.prepare(
+        `
+        SELECT id, applicant_name, grant_type, amount_requested, status, created_at, updated_at
+        FROM grant_applications
+        WHERE status = 'pending'
+        ORDER BY created_at ASC
+        LIMIT 10
+        `
+      ).all();
+
+      const activeProjects = await env.DB.prepare(
+        `
+        SELECT
+          p.id, p.name, p.status, p.priority,
+          COUNT(DISTINCT pt.id) as task_count,
+          COUNT(DISTINCT pm.user_id) as team_size,
+          p.start_date, p.deadline
+        FROM projects p
+        LEFT JOIN project_tasks pt ON p.id = pt.project_id
+        LEFT JOIN project_members pm ON p.id = pm.project_id
+        WHERE p.status = 'active'
+        GROUP BY p.id
+        ORDER BY p.priority DESC, p.deadline ASC
+        LIMIT 10
+        `
+      ).all();
+
+      const overdueTasks = await env.DB.prepare(
+        `
+        SELECT
+          pt.id, pt.title, p.name as project_name,
+          pt.due_date, pt.assigned_to, pt.priority
+        FROM project_tasks pt
+        JOIN projects p ON pt.project_id = p.id
+        WHERE pt.status != 'completed'
+          AND pt.due_date IS NOT NULL
+          AND pt.due_date < date('now')
+        ORDER BY pt.due_date ASC, pt.priority DESC
+        LIMIT 10
+        `
+      ).all();
+
+      const storage = await env.DB.prepare(
+        `
+        SELECT
+          b.bucket_name,
+          b.object_count,
+          ROUND(CAST(b.total_size_bytes AS REAL) / 1024 / 1024 / 1024, 2) as size_gb,
+          b.latest_update
+        FROM v_bucket_stats b
+        ORDER BY b.total_size_bytes DESC
+        LIMIT 10
+        `
+      ).all();
+
+      const deployments = await env.DB.prepare(
+        `
+        SELECT
+          d.id, d.project_name, d.environment,
+          d.status, d.deployed_by, d.deployed_at,
+          COUNT(dl.id) as log_entries
+        FROM deployments d
+        LEFT JOIN deployment_logs dl ON d.id = dl.deployment_id
+        GROUP BY d.id
+        ORDER BY d.deployed_at DESC
+        LIMIT 10
+        `
+      ).all();
+
+      return json({
+        success: true,
+        data: {
+          metrics: counts.results || [],
+          pending_grants: pendingGrants.results || [],
+          active_projects: activeProjects.results || [],
+          overdue_tasks: overdueTasks.results || [],
+          storage_by_bucket: storage.results || [],
+          recent_deployments: deployments.results || [],
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      return json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  if (url.pathname === '/api/grants/pending' && request.method === 'GET') {
+    try {
+      const limit = Math.min(parseInt(url.searchParams.get('limit') || '20', 10) || 20, 100);
+      const result = await env.DB.prepare(
+        `
+        SELECT id, applicant_name, grant_type, amount_requested, status, created_at, updated_at
+        FROM grant_applications
+        WHERE status = 'pending'
+        ORDER BY created_at ASC
+        LIMIT ?
+        `
+      ).bind(limit).all();
+      return json({ success: true, data: result.results || [] });
+    } catch (error) {
+      return json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  if (url.pathname === '/api/grants/summary' && request.method === 'GET') {
+    try {
+      const result = await env.DB.prepare(
+        `
+        SELECT
+          grant_type,
+          COUNT(*) as total,
+          SUM(amount_requested) as total_requested,
+          SUM(amount_approved) as total_approved,
+          ROUND(AVG(amount_approved), 2) as avg_approved
+        FROM grant_applications
+        WHERE status = 'approved'
+        GROUP BY grant_type
+        ORDER BY total DESC
+        `
+      ).all();
+      return json({ success: true, data: result.results || [] });
+    } catch (error) {
+      return json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  if (url.pathname === '/api/projects/active' && request.method === 'GET') {
+    try {
+      const result = await env.DB.prepare(
+        `
+        SELECT
+          p.id, p.name, p.status, p.priority,
+          COUNT(DISTINCT pt.id) as task_count,
+          COUNT(DISTINCT pm.user_id) as team_size,
+          p.start_date, p.deadline
+        FROM projects p
+        LEFT JOIN project_tasks pt ON p.id = pt.project_id
+        LEFT JOIN project_members pm ON p.id = pm.project_id
+        WHERE p.status = 'active'
+        GROUP BY p.id
+        ORDER BY p.priority DESC, p.deadline ASC
+        `
+      ).all();
+      return json({ success: true, data: result.results || [] });
+    } catch (error) {
+      return json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  if (url.pathname === '/api/tasks/overdue' && request.method === 'GET') {
+    try {
+      const limit = Math.min(parseInt(url.searchParams.get('limit') || '20', 10) || 20, 100);
+      const result = await env.DB.prepare(
+        `
+        SELECT
+          pt.id, pt.title, p.name as project_name,
+          pt.due_date, pt.assigned_to, pt.priority
+        FROM project_tasks pt
+        JOIN projects p ON pt.project_id = p.id
+        WHERE pt.status != 'completed'
+          AND pt.due_date IS NOT NULL
+          AND pt.due_date < date('now')
+        ORDER BY pt.due_date ASC, pt.priority DESC
+        LIMIT ?
+        `
+      ).bind(limit).all();
+      return json({ success: true, data: result.results || [] });
+    } catch (error) {
+      return json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  if (url.pathname === '/api/storage/buckets' && request.method === 'GET') {
+    try {
+      const result = await env.DB.prepare(
+        `
+        SELECT
+          b.bucket_name,
+          b.object_count,
+          ROUND(CAST(b.total_size_bytes AS REAL) / 1024 / 1024 / 1024, 2) as size_gb,
+          b.latest_update
+        FROM v_bucket_stats b
+        ORDER BY b.total_size_bytes DESC
+        `
+      ).all();
+      return json({ success: true, data: result.results || [] });
+    } catch (error) {
+      return json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  if (url.pathname === '/api/deployments/recent' && request.method === 'GET') {
+    try {
+      const limit = Math.min(parseInt(url.searchParams.get('limit') || '10', 10) || 10, 50);
+      const result = await env.DB.prepare(
+        `
+        SELECT
+          d.id, d.project_name, d.environment,
+          d.status, d.deployed_by, d.deployed_at,
+          COUNT(dl.id) as log_entries
+        FROM deployments d
+        LEFT JOIN deployment_logs dl ON d.id = dl.deployment_id
+        GROUP BY d.id
+        ORDER BY d.deployed_at DESC
+        LIMIT ?
+        `
+      ).bind(limit).all();
+      return json({ success: true, data: result.results || [] });
+    } catch (error) {
+      return json({ success: false, error: error.message }, { status: 500 });
+    }
   }
 
   // API: Query D1 (direct SQL endpoint)
