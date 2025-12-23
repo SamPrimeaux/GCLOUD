@@ -182,6 +182,48 @@ async function handleAPI(request, env, ctx) {
     }
   }
 
+  // --------------------------------------------------------------------------
+  // AutoRAG ingestion (protected) - uses R2 bindings, stores into D1
+  // --------------------------------------------------------------------------
+
+  if (url.pathname === '/api/autorag/ingest' && request.method === 'POST') {
+    const auth = requireInternalAuth();
+    if (!auth.ok) return json(auth.body, { status: auth.status });
+
+    try {
+      const { bucket_name, prefix = '', limit = 200, max_bytes = 1000000 } = await request.json();
+      const server = new MCPServer(env);
+      const result = await server.autoragIngestR2({ bucket_name, prefix, limit, max_bytes });
+      return json({ success: true, data: result });
+    } catch (error) {
+      return json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
+  if (url.pathname === '/api/autorag/status' && request.method === 'GET') {
+    const auth = requireInternalAuth();
+    if (!auth.ok) return json(auth.body, { status: auth.status });
+
+    try {
+      if (!env.DB) throw new Error('D1 not configured');
+      const rows = await env.DB.prepare(
+        `
+        SELECT
+          category,
+          COUNT(*) as entries,
+          MAX(updated_at) as last_updated
+        FROM ai_knowledge_base
+        WHERE category LIKE 'autorag-%'
+        GROUP BY category
+        ORDER BY entries DESC
+        `
+      ).all();
+      return json({ success: true, data: rows.results || [] });
+    } catch (error) {
+      return json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
   // API: Verify endpoint
   if (url.pathname === '/api/verify') {
     return new Response(JSON.stringify({
@@ -780,7 +822,9 @@ async function handleAPI(request, env, ctx) {
       '/api/seo/update (POST)',
       '/api/seo/generate (POST)',
       '/api/chat',
-      '/api/ai/:provider'
+      '/api/ai/:provider',
+      '/api/autorag/ingest (POST, protected)',
+      '/api/autorag/status (GET, protected)'
     ]
   }), {
     status: 404,
