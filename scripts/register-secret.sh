@@ -133,10 +133,10 @@ EOF
 # Execute SQL
 if [ "$REMOTE" = true ]; then
   echo -e "${YELLOW}Executing on remote D1...${NC}"
-  echo "$SQL" | npx wrangler d1 execute MEAUXOS_DB --remote
+  echo "$SQL" | npx wrangler d1 execute meauxos --remote
 else
   echo -e "${YELLOW}Executing on local D1...${NC}"
-  echo "$SQL" | npx wrangler d1 execute MEAUXOS_DB --local
+  echo "$SQL" | npx wrangler d1 execute meauxos --local
 fi
 
 if [ $? -eq 0 ]; then

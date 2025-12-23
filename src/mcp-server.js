@@ -21,7 +21,7 @@ export class MCPServer {
     return {
       // D1 SQL Query Tool
       'query_d1': {
-        description: 'Execute SQL queries on the D1 database (MEAUXOS_DB)',
+        description: 'Execute SQL queries on the D1 database (DB)',
         parameters: {
           type: 'object',
           properties: {
@@ -351,13 +351,13 @@ export class MCPServer {
   async queryD1(args) {
     const { query, params = [] } = args;
 
-    if (!this.env.MEAUXOS_DB) {
+    if (!this.env.DB) {
       throw new Error('D1 database not configured');
     }
 
     const stmt = params.length > 0
-      ? this.env.MEAUXOS_DB.prepare(query).bind(...params)
-      : this.env.MEAUXOS_DB.prepare(query);
+      ? this.env.DB.prepare(query).bind(...params)
+      : this.env.DB.prepare(query);
 
     const result = await stmt.all();
     return result.results;

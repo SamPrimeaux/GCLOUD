@@ -5,7 +5,7 @@
 
 ## Database Validation
 
-### D1 Database: MEAUXOS_DB ✅
+### D1 Database: meauxos (binding: DB) ✅
 
 **Tables Created:** 8
 - ✅ `r2_buckets` - 6 buckets registered
@@ -192,7 +192,7 @@ npx wrangler deploy
 
 **Remote Environment:** 🟡 Ready for Deployment
 - Schema ready
-- Need to run: `npx wrangler d1 execute MEAUXOS_DB --remote --file=schema.sql`
+- Need to run: `npx wrangler d1 execute meauxos --remote --file=schema.sql`
 - Need to deploy worker: `npx wrangler deploy`
 
 ## Documentation
@@ -219,7 +219,7 @@ npx wrangler deploy
 
 1. **Deploy to Remote:**
    ```bash
-   npx wrangler d1 execute MEAUXOS_DB --remote --file=schema.sql
+   npx wrangler d1 execute meauxos --remote --file=schema.sql
    npx wrangler deploy
    ```
 

@@ -17,7 +17,7 @@ echo ""
 
 # Get all SEO entries from D1
 echo -e "${YELLOW}Fetching SEO entries from D1...${NC}"
-D1_DATA=$(npx wrangler d1 execute MEAUXOS_DB --local --command \
+D1_DATA=$(npx wrangler d1 execute meauxos --local --command \
   "SELECT * FROM seo_meta" 2>/dev/null | grep -A 1000 "results" | \
   python3 -c "import sys, json; data = json.load(sys.stdin); print(json.dumps(data[0]['results']))" 2>/dev/null)
 

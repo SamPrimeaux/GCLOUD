@@ -60,7 +60,7 @@ while IFS='|' read -r BUCKET BINDING DESC; do
   echo -e "    Description: ${DESC}"
 
   # Insert into D1 (local)
-  OUTPUT=$(npx wrangler d1 execute MEAUXOS_DB --local --command \
+  OUTPUT=$(npx wrangler d1 execute meauxos --local --command \
     "INSERT OR IGNORE INTO r2_buckets (bucket_name, binding_name, description)
      VALUES ('$BUCKET', '$BINDING', '$DESC')" 2>&1)
 
@@ -83,11 +83,11 @@ echo ""
 
 # Show current count in D1
 echo -e "${BLUE}Current D1 bucket registry:${NC}"
-npx wrangler d1 execute MEAUXOS_DB --local --command \
+npx wrangler d1 execute meauxos --local --command \
   "SELECT COUNT(*) as total_buckets FROM r2_buckets" | grep -A 5 "results"
 
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"
-echo "1. List buckets: npx wrangler d1 execute MEAUXOS_DB --local --file=scripts/list-all-buckets.sql"
-echo "2. Sync to remote: npx wrangler d1 execute MEAUXOS_DB --remote --file=schema.sql"
+echo "1. List buckets: npx wrangler d1 execute meauxos --local --file=scripts/list-all-buckets.sql"
+echo "2. Sync to remote: npx wrangler d1 execute meauxos --remote --file=schema.sql"
 echo "3. Deploy: npx wrangler deploy"

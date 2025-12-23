@@ -52,7 +52,7 @@ bucket_name = "meauxbility-dashboard"
 
 # D1 Database
 [[d1_databases]]
-binding = "MEAUXOS_DB"
+binding = "DB"
 database_name = "meauxos"
 database_id = "d8261777-9384-44f7-924d-c92247d55b46"
 

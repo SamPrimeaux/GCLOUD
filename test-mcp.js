@@ -7,7 +7,7 @@ import { MCPServer } from './src/mcp-server.js';
 
 // Mock environment for local testing
 const mockEnv = {
-  MEAUXOS_DB: null, // Will be initialized by wrangler
+  DB: null, // Will be initialized by wrangler
   ALLINFRASTRUCTURE: null,
   APP_ASSETS: null,
   EMAIL_ARCHIVE: null,

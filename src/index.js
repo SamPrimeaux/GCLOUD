@@ -60,7 +60,7 @@ export default {
         features: {
           mcp: true,
           mcp_tools: 17,
-          d1: !!env.MEAUXOS_DB,
+          d1: !!env.DB,
           r2_buckets: 6,
           secret_management: true,
           knowledge_base: true,

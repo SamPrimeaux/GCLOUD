@@ -2,10 +2,10 @@
 
 ## Your Cloudflare Credentials
 
-You have these credentials ready to use:
+You will need these credentials:
 
-- **Account ID**: `ede6590ac0d2fb7daf155b35653457b2`
-- **API Token**: `cCvHyeJ9xLgfFGgV-L_5xhPz-_wbafF5r0JrtbOF`
+- **Account ID**: `<your_cf_account_id>`
+- **API Token**: `<your_cloudflare_api_token>`
 
 ## Setting Up GitHub Repository Secrets
 
@@ -22,17 +22,17 @@ Add these secrets one by one:
 
 #### 1. CLOUDFLARE_API_TOKEN
 - **Name**: `CLOUDFLARE_API_TOKEN`
-- **Value**: `cCvHyeJ9xLgfFGgV-L_5xhPz-_wbafF5r0JrtbOF`
+- **Value**: `<your_cloudflare_api_token>`
 - Click **Add secret**
 
 #### 2. CF_ACCOUNT_ID
 - **Name**: `CF_ACCOUNT_ID`
-- **Value**: `ede6590ac0d2fb7daf155b35653457b2`
+- **Value**: `<your_cf_account_id>`
 - Click **Add secret**
 
 #### 3. CLOUDFLARE_ACCOUNT_ID (alternative name, some workflows use this)
 - **Name**: `CLOUDFLARE_ACCOUNT_ID`
-- **Value**: `ede6590ac0d2fb7daf155b35653457b2`
+- **Value**: `<your_cf_account_id>`
 - Click **Add secret**
 
 #### 4. MEAUXBILITY_GH_DASHBOARD
@@ -64,9 +64,9 @@ The secrets will be masked and only show their names.
 
 ## Testing the Setup
 
-Once secrets are added, your GitHub Actions workflows will automatically:
-1. Deploy to GitHub Pages (via `deploy-github-pages.yml`)
-2. Deploy to Cloudflare Workers (via `ci-di-deploy`)
+Once secrets are added, your GitHub Actions workflow will automatically:
+1. Run checks on PRs
+2. Deploy to GitHub Pages and Cloudflare Workers on merges/pushes to `main` (via `ci-cd.yml`)
 
 Push any commit to trigger the workflows:
 ```bash
@@ -82,7 +82,7 @@ Your workflows will deploy to Cloudflare Workers using these credentials. The wo
 `https://your-worker-name.your-subdomain.workers.dev`
 
 You can manage your workers at:
-https://dash.cloudflare.com/ede6590ac0d2fb7daf155b35653457b2/workers
+https://dash.cloudflare.com/<your_cf_account_id>/workers
 
 ## Troubleshooting
 

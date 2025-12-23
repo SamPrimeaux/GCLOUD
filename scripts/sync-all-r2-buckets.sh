@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sync All R2 Buckets to D1 Database
-# Registers all Cloudflare R2 buckets in your account to MEAUXOS_DB for SQL querying
+# Registers all Cloudflare R2 buckets in your account to the D1 database for SQL querying
 
 set -e
 
@@ -20,7 +20,7 @@ if [ -z "$BUCKETS" ]; then
   echo -e "${YELLOW}⚠ Could not fetch buckets via wrangler. Please provide bucket names manually.${NC}"
   echo ""
   echo "Usage: Manually register buckets with:"
-  echo "  npx wrangler d1 execute MEAUXOS_DB --local --command \\"
+  echo "  npx wrangler d1 execute meauxos --local --command \\"
   echo "    \"INSERT OR IGNORE INTO r2_buckets (bucket_name, binding_name, description) VALUES ('bucket-name', 'BINDING', 'Description')\""
   exit 1
 fi
@@ -40,7 +40,7 @@ for BUCKET in $BUCKETS; do
   BINDING=$(echo "$BUCKET" | tr '[:lower:]' '[:upper:]' | tr '-' '_')
 
   # Insert into D1 (local)
-  npx wrangler d1 execute MEAUXOS_DB --local --command \
+  npx wrangler d1 execute meauxos --local --command \
     "INSERT OR IGNORE INTO r2_buckets (bucket_name, binding_name, description)
      VALUES ('$BUCKET', '$BINDING', 'Auto-registered bucket')" >/dev/null 2>&1
 
@@ -62,11 +62,11 @@ echo ""
 
 # Show current count in D1
 echo -e "${BLUE}Current D1 bucket count:${NC}"
-npx wrangler d1 execute MEAUXOS_DB --local --command \
+npx wrangler d1 execute meauxos --local --command \
   "SELECT COUNT(*) as total FROM r2_buckets" | grep -A 5 "results"
 
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"
-echo "1. Sync to remote D1: npx wrangler d1 execute MEAUXOS_DB --remote --file=schema.sql"
+echo "1. Sync to remote D1: npx wrangler d1 execute meauxos --remote --file=schema.sql"
 echo "2. Deploy worker: npx wrangler deploy"
 echo "3. Query all buckets: curl https://gcloudv3.meauxbility.workers.dev/api/r2/buckets"
