@@ -4,535 +4,253 @@
  */
 
 export const HTML_CONTENT = `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Global Impact - Meauxbility Foundation | GCLOUD v3</title>
-    <meta name="description" content="Meauxbility Foundation - Transforming lives through mobility. EIN: 33-4214907 501(c)(3)">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MeauxAccess | Unified Operations Hub</title>
 
-        * {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            overscroll-behavior: none;
-        }
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-        :root {
-            --meaux-primary: #10b981;
-            --meaux-dark: #059669;
-            --ios-safe-top: env(safe-area-inset-top);
-            --ios-safe-bottom: env(safe-area-inset-bottom);
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+          colors: {
+            meaux: { cyan: '#00D4FF', blue: '#0077FF', purple: '#8b5cf6', pink: '#ec4899', indigo: '#6366f1' },
+            slate: { 850: '#151e2e', 900: '#0f172a', 950: '#020617' }
+          },
+          animation: { 'float': 'float 6s ease-in-out infinite' },
+          keyframes: { float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } } }
         }
+      }
+    };
+  </script>
 
-        .mobile-header {
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            background: rgba(255, 255, 255, 0.92);
-            border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
-            padding-top: var(--ios-safe-top);
-        }
-
-        .gradient-bg {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-
-        .ios-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .chart-container {
-            position: relative;
-            height: 280px;
-        }
-
-        @keyframes countUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .animate-count-up {
-            animation: countUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-    </style>
+  <style>
+    body { cursor: none; }
+    .cursor-dot, .cursor-outline { position: fixed; top: 0; left: 0; transform: translate(-50%, -50%); border-radius: 50%; z-index: 9999; pointer-events: none; }
+    .cursor-dot { width: 8px; height: 8px; background-color: #00D4FF; }
+    .cursor-outline { width: 40px; height: 40px; border: 1px solid rgba(0, 212, 255, 0.5); transition: width 0.2s, height 0.2s, background-color 0.2s; }
+    body.hovering .cursor-outline { width: 60px; height: 60px; background-color: rgba(0, 212, 255, 0.05); border-color: #00D4FF; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #020617; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    .hero-glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.05); }
+  </style>
 </head>
-<body class="bg-gray-50">
 
-    <header class="mobile-header fixed top-0 left-0 right-0 z-50">
-        <div class="flex items-center justify-between px-4 h-14">
-            <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
-                    <span class="text-white font-bold text-sm">M</span>
+<body class="bg-slate-950 text-slate-300 font-sans antialiased overflow-hidden selection:bg-meaux-cyan selection:text-white">
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-outline" id="cursor-outline"></div>
+
+  <div class="flex h-screen w-full relative">
+    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-950 relative">
+      <header class="h-20 border-b border-slate-800 bg-slate-950/80 backdrop-blur-md z-20 flex items-center justify-between px-8">
+        <div class="text-white font-bold">MeauxAccess</div>
+        <div class="text-xs text-slate-500 font-mono">D1: <span id="d1-status" class="text-slate-300">checking…</span></div>
+      </header>
+
+      <div class="flex-1 overflow-y-auto relative scroll-smooth">
+        <div class="max-w-[1600px] mx-auto p-6 md:p-10 space-y-8 relative z-10">
+          <div class="hero-glass rounded-3xl p-8 border border-white/5 relative">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+              <div class="space-y-6">
+                <h1 class="text-5xl font-bold leading-tight text-white tracking-tight">
+                  Unified <span class="text-transparent bg-clip-text bg-gradient-to-r from-meaux-cyan to-meaux-purple">Operations Hub</span>
+                </h1>
+                <p class="text-slate-400 text-lg leading-relaxed">Live dashboard backed by Cloudflare D1 via Worker APIs.</p>
+                <button id="refreshBtn" class="px-6 py-3 rounded-xl bg-gradient-to-r from-meaux-cyan to-meaux-blue text-white font-bold shadow-lg shadow-meaux-cyan/25 hover:shadow-meaux-cyan/40 transition-all">Refresh</button>
+              </div>
+              <div class="h-[300px] w-full relative">
+                <div id="canvas-container" class="w-full h-full absolute inset-0 rounded-2xl overflow-hidden"></div>
+                <div class="absolute bottom-6 right-6 bg-slate-900/80 backdrop-blur-md p-4 rounded-xl border border-white/10 flex items-center gap-4 animate-float">
+                  <div class="w-10 h-10 rounded-full bg-meaux-cyan/20 flex items-center justify-center text-meaux-cyan font-black">M</div>
+                  <div>
+                    <div class="text-xs text-slate-400 uppercase tracking-wider">Worker Health</div>
+                    <div class="text-lg font-mono font-bold text-white" id="health-pill">…</div>
+                  </div>
                 </div>
-                <span class="font-bold text-gray-900 text-lg">Meauxbility</span>
-                <span class="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">GCLOUD v3 ✓</span>
+              </div>
             </div>
+          </div>
+
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="p-4 rounded-2xl bg-slate-900/50 border border-white/10">
+              <div class="text-xs text-slate-500 uppercase tracking-widest">Grants</div>
+              <div id="kpi-grants" class="text-2xl font-bold text-white mt-2">—</div>
+              <div id="kpi-pending-grants" class="text-xs text-slate-400 mt-1">Pending: —</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-900/50 border border-white/10">
+              <div class="text-xs text-slate-500 uppercase tracking-widest">Active Projects</div>
+              <div id="kpi-projects" class="text-2xl font-bold text-white mt-2">—</div>
+              <div class="text-xs text-slate-400 mt-1">Operational workload</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-900/50 border border-white/10">
+              <div class="text-xs text-slate-500 uppercase tracking-widest">R2 Buckets</div>
+              <div id="kpi-buckets" class="text-2xl font-bold text-white mt-2">—</div>
+              <div class="text-xs text-slate-400 mt-1">Registry</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-900/50 border border-white/10">
+              <div class="text-xs text-slate-500 uppercase tracking-widest">SEO Pages</div>
+              <div id="kpi-seo" class="text-2xl font-bold text-white mt-2">—</div>
+              <div class="text-xs text-slate-400 mt-1">Published</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="hero-glass rounded-2xl p-6 border border-white/5">
+              <div class="flex items-center justify-between mb-4 pb-4 border-b border-white/5">
+                <h3 class="text-xl font-bold text-white">Pending Grants</h3>
+                <div class="text-xs text-slate-500 font-mono" id="pending-grants-count">—</div>
+              </div>
+              <div class="overflow-y-auto max-h-[350px]">
+                <table class="w-full text-sm">
+                  <thead class="text-xs text-slate-500 uppercase tracking-wider">
+                    <tr>
+                      <th class="text-left py-2 pr-3">Applicant</th>
+                      <th class="text-left py-2 pr-3">Type</th>
+                      <th class="text-right py-2 pr-3">Requested</th>
+                      <th class="text-left py-2 pr-3">Created</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pending-grants-rows" class="divide-y divide-white/5"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="hero-glass rounded-2xl p-6 border border-white/5">
+              <div class="flex items-center justify-between mb-4 pb-4 border-b border-white/5">
+                <h3 class="text-xl font-bold text-white">Overdue Tasks</h3>
+                <div class="text-xs text-slate-500 font-mono" id="overdue-tasks-count">—</div>
+              </div>
+              <div class="overflow-y-auto max-h-[350px]">
+                <table class="w-full text-sm">
+                  <thead class="text-xs text-slate-500 uppercase tracking-wider">
+                    <tr>
+                      <th class="text-left py-2 pr-3">Task</th>
+                      <th class="text-left py-2 pr-3">Project</th>
+                      <th class="text-left py-2 pr-3">Due</th>
+                      <th class="text-right py-2 pr-3">P</th>
+                    </tr>
+                  </thead>
+                  <tbody id="overdue-tasks-rows" class="divide-y divide-white/5"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
         </div>
-    </header>
-
-    <main class="pt-14">
-        <div class="gradient-bg text-white py-12 px-4">
-            <div class="max-w-6xl mx-auto">
-                <div class="text-center mb-8">
-                    <h1 class="text-3xl md:text-4xl font-bold mb-2">Global Impact Dashboard</h1>
-                    <p class="text-green-100">Transforming lives through mobility | EIN: 33-4214907</p>
-                    <div class="mt-3 inline-block px-3 py-1 bg-white/20 rounded-full text-sm">
-                        🚀 Deployed via GCLOUD CI/CD Pipeline
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="text-center">
-                        <div class="inline-block p-3 bg-white/20 rounded-2xl mb-3">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <p id="metric-grants-funded" class="text-4xl font-bold mb-1 animate-count-up">—</p>
-                        <p class="text-green-100 text-sm">Grants Funded</p>
-                    </div>
-
-                    <div class="text-center">
-                        <div class="inline-block p-3 bg-white/20 rounded-2xl mb-3">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <p id="metric-active-projects" class="text-4xl font-bold mb-1 animate-count-up">—</p>
-                        <p class="text-green-100 text-sm">Active Projects</p>
-                    </div>
-
-                    <div class="text-center">
-                        <div class="inline-block p-3 bg-white/20 rounded-2xl mb-3">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                            </svg>
-                        </div>
-                        <p id="metric-r2-buckets" class="text-4xl font-bold mb-1 animate-count-up">—</p>
-                        <p class="text-green-100 text-sm">R2 Buckets</p>
-                    </div>
-
-                    <div class="text-center">
-                        <div class="inline-block p-3 bg-white/20 rounded-2xl mb-3">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <p id="metric-seo-pages" class="text-4xl font-bold mb-1 animate-count-up">—</p>
-                        <p class="text-green-100 text-sm">SEO Pages</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
-            <!-- MCP Success Banner -->
-            <div class="ios-card bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 p-6">
-                <div class="flex items-center space-x-3 mb-3">
-                    <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-900">✅ MCP Integration Live!</h2>
-                        <p class="text-gray-600">GCLOUD v3 with SQL on R2 buckets deployed successfully</p>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                    <div class="bg-white rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">Worker</div>
-                        <div class="font-semibold text-gray-900">gcloudv3 ✓</div>
-                    </div>
-                    <div class="bg-white rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">MCP Endpoint</div>
-                        <div class="font-semibold text-gray-900">/mcp ✓</div>
-                    </div>
-                    <div class="bg-white rounded-lg p-3">
-                        <div class="text-xs text-gray-500 mb-1">Status</div>
-                        <div class="font-semibold text-green-600">Live & Ready ✓</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- API Endpoints Card -->
-            <div class="ios-card p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">🚀 Available API Endpoints</h3>
-                <div class="space-y-2 text-sm font-mono">
-                    <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <span>GET /health</span>
-                        <span class="text-green-600">✓</span>
-                    </div>
-                    <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <span>POST /mcp</span>
-                        <span class="text-green-600">✓</span>
-                    </div>
-                    <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <span>GET /api/mcp/tools</span>
-                        <span class="text-green-600">✓</span>
-                    </div>
-                    <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <span>POST /api/d1/query</span>
-                        <span class="text-green-600">✓</span>
-                    </div>
-                    <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <span>GET /api/r2/buckets</span>
-                        <span class="text-green-600">✓</span>
-                    </div>
-                    <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <span>POST /api/chat</span>
-                        <span class="text-green-600">✓</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Charts -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div class="ios-card p-5">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">Grant Types Distribution</h3>
-                    <div class="chart-container">
-                        <canvas id="grantTypesChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="ios-card p-5">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">Monthly Funding Trends</h3>
-                    <div class="chart-container">
-                        <canvas id="fundingTrendsChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Command Center Panels -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div class="ios-card p-5">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">Pending Grant Applications</h3>
-                        <span id="pending-grants-count" class="text-xs font-semibold text-gray-500">—</span>
-                    </div>
-                    <div class="overflow-auto">
-                        <table class="min-w-full text-sm">
-                            <thead class="text-xs text-gray-500">
-                                <tr>
-                                    <th class="text-left py-2 pr-3">Applicant</th>
-                                    <th class="text-left py-2 pr-3">Type</th>
-                                    <th class="text-right py-2 pr-3">Requested</th>
-                                    <th class="text-left py-2 pr-3">Created</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pending-grants-rows" class="divide-y divide-gray-100"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="ios-card p-5">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">Overdue Tasks</h3>
-                        <span id="overdue-tasks-count" class="text-xs font-semibold text-gray-500">—</span>
-                    </div>
-                    <div class="overflow-auto">
-                        <table class="min-w-full text-sm">
-                            <thead class="text-xs text-gray-500">
-                                <tr>
-                                    <th class="text-left py-2 pr-3">Task</th>
-                                    <th class="text-left py-2 pr-3">Project</th>
-                                    <th class="text-left py-2 pr-3">Due</th>
-                                    <th class="text-right py-2 pr-3">Priority</th>
-                                </tr>
-                            </thead>
-                            <tbody id="overdue-tasks-rows" class="divide-y divide-gray-100"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div class="ios-card p-5">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">Active Projects</h3>
-                        <span id="active-projects-count" class="text-xs font-semibold text-gray-500">—</span>
-                    </div>
-                    <div id="active-projects-list" class="space-y-3"></div>
-                </div>
-
-                <div class="ios-card p-5">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">Infrastructure Snapshot</h3>
-                        <span class="text-xs font-semibold text-gray-500">Storage & Deploys</span>
-                    </div>
-                    <div class="space-y-4">
-                        <div>
-                            <div class="text-xs font-semibold text-gray-500 mb-2">Top Buckets by Size</div>
-                            <div class="overflow-auto">
-                                <table class="min-w-full text-sm">
-                                    <thead class="text-xs text-gray-500">
-                                        <tr>
-                                            <th class="text-left py-2 pr-3">Bucket</th>
-                                            <th class="text-right py-2 pr-3">GB</th>
-                                            <th class="text-right py-2 pr-3">Objects</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="storage-rows" class="divide-y divide-gray-100"></tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="text-xs font-semibold text-gray-500 mb-2">Recent Deployments</div>
-                            <div class="overflow-auto">
-                                <table class="min-w-full text-sm">
-                                    <thead class="text-xs text-gray-500">
-                                        <tr>
-                                            <th class="text-left py-2 pr-3">Project</th>
-                                            <th class="text-left py-2 pr-3">Env</th>
-                                            <th class="text-left py-2 pr-3">Status</th>
-                                            <th class="text-left py-2 pr-3">When</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="deployments-rows" class="divide-y divide-gray-100"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Metrics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="ios-card bg-gradient-to-br from-blue-500 to-blue-600 p-5 text-white">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-sm font-semibold">Processing Speed</h3>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                        </svg>
-                    </div>
-                    <p class="text-3xl font-bold mb-1">8.3 days</p>
-                    <p class="text-blue-100 text-sm">Average approval time</p>
-                    <div class="mt-3 pt-3 border-t border-blue-400">
-                        <p class="text-xs text-blue-100">↓ 42% faster than 2023</p>
-                    </div>
-                </div>
-
-                <div class="ios-card bg-gradient-to-br from-green-500 to-green-600 p-5 text-white">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-sm font-semibold">Approval Rate</h3>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <p class="text-3xl font-bold mb-1">87%</p>
-                    <p class="text-green-100 text-sm">Applications approved</p>
-                    <div class="mt-3 pt-3 border-t border-green-400">
-                        <p class="text-xs text-green-100">↑ 5% vs last year</p>
-                    </div>
-                </div>
-
-                <div class="ios-card bg-gradient-to-br from-purple-500 to-purple-600 p-5 text-white">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-sm font-semibold">Average Grant</h3>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <p class="text-3xl font-bold mb-1">$9,450</p>
-                    <p class="text-purple-100 text-sm">Per funded grant</p>
-                    <div class="mt-3 pt-3 border-t border-purple-400">
-                        <p class="text-xs text-purple-100">Range: $500 - $25,000</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer Info -->
-            <div class="ios-card p-6 text-center">
-                <p class="text-sm text-gray-600 mb-2">Meauxbility Foundation | 501(c)(3) Non-Profit</p>
-                <p class="text-xs text-gray-500">EIN: 33-4214907 | Transforming lives through mobility solutions</p>
-                <p class="text-xs text-green-600 font-semibold mt-3">✓ GCLOUD v3 + MCP Integration | gcloudv3.meauxbility.workers.dev</p>
-            </div>
-        </div>
+      </div>
     </main>
+  </div>
 
-    <script>
-        async function fetchJSON(path) {
-            const res = await fetch(path, { headers: { 'accept': 'application/json' } });
-            const data = await res.json();
-            if (!res.ok || data.success === false) {
-                throw new Error(data.error || res.statusText);
-            }
-            return data;
-        }
+  <script>
+    async function fetchJSON(path, init) {
+      const res = await fetch(path, init);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.success === false) throw new Error(data.error || res.statusText);
+      return data;
+    }
+    function formatMoney(n) {
+      const num = Number(n);
+      if (Number.isNaN(num)) return '—';
+      return num.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+    }
+    function formatDate(d) {
+      if (!d) return '—';
+      const dt = new Date(d);
+      if (Number.isNaN(dt.getTime())) return String(d);
+      return dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    }
+    async function hydrate() {
+      const health = await fetchJSON('/health').catch(() => null);
+      document.getElementById('health-pill').textContent = health?.status === 'ok' ? 'OK' : 'ERR';
+      document.getElementById('d1-status').textContent = health?.features?.d1 ? 'connected' : 'missing';
 
-        function formatMoney(n) {
-            if (n === null || n === undefined) return '—';
-            const num = Number(n);
-            if (Number.isNaN(num)) return '—';
-            return num.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
-        }
+      const overview = await fetchJSON('/api/dashboard/overview');
+      const data = overview.data || {};
+      const metricMap = Object.fromEntries((data.metrics || []).map(m => [m.metric, m.value]));
+      document.getElementById('kpi-grants').textContent = metricMap['Grants'] ?? '—';
+      document.getElementById('kpi-pending-grants').textContent = \`Pending: \${metricMap['Pending Grants'] ?? '—'}\`;
+      document.getElementById('kpi-projects').textContent = metricMap['Active Projects'] ?? '—';
+      document.getElementById('kpi-buckets').textContent = metricMap['R2 Buckets'] ?? '—';
+      document.getElementById('kpi-seo').textContent = metricMap['SEO Pages'] ?? '—';
 
-        function formatDate(d) {
-            if (!d) return '—';
-            try {
-                const dt = new Date(d);
-                return dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-            } catch (e) {
-                return String(d);
-            }
-        }
+      const pending = data.pending_grants || [];
+      document.getElementById('pending-grants-count').textContent = \`\${pending.length} shown\`;
+      document.getElementById('pending-grants-rows').innerHTML = pending.map(g => \`
+        <tr>
+          <td class="py-2 pr-3 font-medium text-white">\${g.applicant_name || '—'}</td>
+          <td class="py-2 pr-3 text-slate-400">\${g.grant_type || '—'}</td>
+          <td class="py-2 pr-3 text-right text-white">\${formatMoney(g.amount_requested)}</td>
+          <td class="py-2 pr-3 text-slate-400">\${formatDate(g.created_at)}</td>
+        </tr>\`).join('') || \`<tr><td class="py-3 text-slate-500" colspan="4">No pending grants</td></tr>\`;
 
-        // Grant Types Chart
-        const grantTypesCtx = document.getElementById('grantTypesChart').getContext('2d');
-        const grantTypesChart = new Chart(grantTypesCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Power Chairs', 'Home Modifications', 'Vehicle Modifications', 'Manual Chairs', 'Other Equipment'],
-                datasets: [{
-                    data: [45, 28, 15, 8, 4],
-                    backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            boxWidth: 12,
-                            font: { size: 11, family: 'Inter' }
-                        }
-                    }
-                }
-            }
-        });
+      const overdue = data.overdue_tasks || [];
+      document.getElementById('overdue-tasks-count').textContent = \`\${overdue.length} shown\`;
+      document.getElementById('overdue-tasks-rows').innerHTML = overdue.map(t => \`
+        <tr>
+          <td class="py-2 pr-3 font-medium text-white">\${t.title || '—'}</td>
+          <td class="py-2 pr-3 text-slate-400">\${t.project_name || '—'}</td>
+          <td class="py-2 pr-3 text-slate-400">\${formatDate(t.due_date)}</td>
+          <td class="py-2 pr-3 text-right text-white">\${t.priority ?? 0}</td>
+        </tr>\`).join('') || \`<tr><td class="py-3 text-slate-500" colspan="4">No overdue tasks</td></tr>\`;
+    }
 
-        // Funding Trends Chart
-        const fundingTrendsCtx = document.getElementById('fundingTrendsChart').getContext('2d');
-        new Chart(fundingTrendsCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [{
-                    label: 'Grants Funded',
-                    data: [12, 15, 18, 14, 22, 19, 25, 21, 28, 24, 31, 27],
-                    backgroundColor: '#10b981',
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
+    function initGalaxy() {
+      const container = document.getElementById('canvas-container');
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x0f172a, 0.04);
+      const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+      camera.position.z = 25;
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      container.appendChild(renderer.domElement);
 
-        console.log('✅ GCLOUD v3 - MCP Integration Dashboard Loaded!');
-        console.log('🚀 MCP Endpoint: /mcp');
-        console.log('📊 API Docs: /api/mcp/tools');
+      const group = new THREE.Group(); scene.add(group);
+      const starGeo = new THREE.BufferGeometry();
+      const starCount = 1200;
+      const starPos = new Float32Array(starCount * 3);
+      for (let i = 0; i < starCount; i++) {
+        starPos[i * 3] = (Math.random() - 0.5) * 100;
+        starPos[i * 3 + 1] = (Math.random() - 0.5) * 100;
+        starPos[i * 3 + 2] = (Math.random() - 0.5) * 50;
+      }
+      starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+      const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.15, transparent: true, opacity: 0.8 }));
+      group.add(stars);
+      const core = new THREE.Mesh(new THREE.IcosahedronGeometry(12, 1), new THREE.MeshBasicMaterial({ color: 0x00D4FF, wireframe: true, transparent: true, opacity: 0.03 }));
+      group.add(core);
+      function animate() { requestAnimationFrame(animate); stars.rotation.y += 0.0005; core.rotation.y -= 0.001; core.rotation.x -= 0.0005; renderer.render(scene, camera); }
+      animate();
+      window.addEventListener('resize', () => { camera.aspect = container.clientWidth / container.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(container.clientWidth, container.clientHeight); });
+    }
 
-        // Live data hydration (Command Center)
-        (async () => {
-            try {
-                const { data } = await fetchJSON('/api/dashboard/overview');
+    function initCursor() {
+      const dot = document.getElementById('cursor-dot');
+      const outline = document.getElementById('cursor-outline');
+      window.addEventListener('mousemove', (e) => {
+        dot.style.left = \`\${e.clientX}px\`; dot.style.top = \`\${e.clientY}px\`;
+        outline.animate({ left: \`\${e.clientX}px\`, top: \`\${e.clientY}px\` }, { duration: 500, fill: "forwards" });
+      });
+    }
 
-                // metrics
-                const metricMap = Object.fromEntries((data.metrics || []).map(m => [m.metric, m.value]));
-                document.getElementById('metric-grants-funded').textContent = metricMap['Grants'] ?? '—';
-                document.getElementById('metric-active-projects').textContent = metricMap['Active Projects'] ?? '—';
-                document.getElementById('metric-r2-buckets').textContent = metricMap['R2 Buckets'] ?? '—';
-                document.getElementById('metric-seo-pages').textContent = metricMap['SEO Pages'] ?? '—';
-
-                // pending grants table
-                const pending = data.pending_grants || [];
-                document.getElementById('pending-grants-count').textContent = `${pending.length} shown`;
-                document.getElementById('pending-grants-rows').innerHTML = pending.map(g => `
-                    <tr>
-                        <td class="py-2 pr-3 font-medium text-gray-900">${g.applicant_name || '—'}</td>
-                        <td class="py-2 pr-3 text-gray-600">${g.grant_type || '—'}</td>
-                        <td class="py-2 pr-3 text-right text-gray-900">${formatMoney(g.amount_requested)}</td>
-                        <td class="py-2 pr-3 text-gray-600">${formatDate(g.created_at)}</td>
-                    </tr>
-                `).join('') || `<tr><td class="py-3 text-gray-500" colspan="4">No pending grants</td></tr>`;
-
-                // overdue tasks table
-                const overdue = data.overdue_tasks || [];
-                document.getElementById('overdue-tasks-count').textContent = `${overdue.length} shown`;
-                document.getElementById('overdue-tasks-rows').innerHTML = overdue.map(t => `
-                    <tr>
-                        <td class="py-2 pr-3 font-medium text-gray-900">${t.title || '—'}</td>
-                        <td class="py-2 pr-3 text-gray-600">${t.project_name || '—'}</td>
-                        <td class="py-2 pr-3 text-gray-600">${formatDate(t.due_date)}</td>
-                        <td class="py-2 pr-3 text-right text-gray-900">${t.priority ?? 0}</td>
-                    </tr>
-                `).join('') || `<tr><td class="py-3 text-gray-500" colspan="4">No overdue tasks</td></tr>`;
-
-                // active projects list
-                const projects = data.active_projects || [];
-                document.getElementById('active-projects-count').textContent = `${projects.length} shown`;
-                document.getElementById('active-projects-list').innerHTML = projects.map(p => `
-                    <div class="p-3 bg-gray-50 rounded-xl">
-                        <div class="flex items-center justify-between">
-                            <div class="font-semibold text-gray-900">${p.name}</div>
-                            <div class="text-xs font-semibold text-gray-500">P${p.priority ?? 0}</div>
-                        </div>
-                        <div class="mt-1 text-xs text-gray-600">
-                            Tasks: <span class="font-semibold">${p.task_count ?? 0}</span>
-                            · Team: <span class="font-semibold">${p.team_size ?? 0}</span>
-                            · Deadline: <span class="font-semibold">${formatDate(p.deadline)}</span>
-                        </div>
-                    </div>
-                `).join('') || `<div class="text-sm text-gray-500">No active projects</div>`;
-
-                // storage rows
-                const storage = data.storage_by_bucket || [];
-                document.getElementById('storage-rows').innerHTML = storage.map(b => `
-                    <tr>
-                        <td class="py-2 pr-3 font-medium text-gray-900">${b.bucket_name}</td>
-                        <td class="py-2 pr-3 text-right text-gray-900">${b.size_gb ?? 0}</td>
-                        <td class="py-2 pr-3 text-right text-gray-600">${b.object_count ?? 0}</td>
-                    </tr>
-                `).join('') || `<tr><td class="py-3 text-gray-500" colspan="3">No bucket stats yet</td></tr>`;
-
-                // deployments rows
-                const deps = data.recent_deployments || [];
-                document.getElementById('deployments-rows').innerHTML = deps.map(d => `
-                    <tr>
-                        <td class="py-2 pr-3 font-medium text-gray-900">${d.project_name}</td>
-                        <td class="py-2 pr-3 text-gray-600">${d.environment}</td>
-                        <td class="py-2 pr-3 ${d.status === 'success' ? 'text-green-700' : 'text-red-700'} font-semibold">${d.status}</td>
-                        <td class="py-2 pr-3 text-gray-600">${formatDate(d.deployed_at)}</td>
-                    </tr>
-                `).join('') || `<tr><td class="py-3 text-gray-500" colspan="4">No deployments logged</td></tr>`;
-
-                // update charts using real data (approved grants summary)
-                try {
-                    const summary = await fetchJSON('/api/grants/summary');
-                    const rows = summary.data || [];
-                    if (rows.length > 0) {
-                        grantTypesChart.data.labels = rows.map(r => r.grant_type);
-                        grantTypesChart.data.datasets[0].data = rows.map(r => r.total);
-                        grantTypesChart.update();
-                    }
-                } catch (e) {
-                    // keep placeholder chart if summary not available
-                }
-            } catch (e) {
-                console.warn('Dashboard hydration failed:', e);
-            }
-        })();
-    </script>
+    window.addEventListener('DOMContentLoaded', () => {
+      initGalaxy();
+      initCursor();
+      document.getElementById('refreshBtn').addEventListener('click', () => hydrate().catch(console.warn));
+      hydrate().catch(console.warn);
+    });
+  </script>
 </body>
 </html>`;

@@ -710,6 +710,58 @@ async function handleAPI(request, env, ctx) {
     }
   }
 
+  // API: Agent Sam / UI assistant compatibility endpoint
+  // Your dashboard calls POST /api/ai/{provider} with { prompt, context }.
+  // We map that to GitHub Models (if configured) and return { response }.
+  if (url.pathname.startsWith('/api/ai/') && request.method === 'POST') {
+    try {
+      const provider = url.pathname.split('/').pop();
+      const { prompt, context } = await request.json();
+
+      if (!env.GCLOUD_GH_TOKEN) {
+        return json(
+          {
+            success: false,
+            error: 'AI not configured (set GCLOUD_GH_TOKEN)',
+            provider,
+          },
+          { status: 503 }
+        );
+      }
+
+      const system = context || 'You are Agent Sam, the MeauxOS operations assistant.';
+      const user = prompt || '';
+
+      const response = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${env.GCLOUD_GH_TOKEN}`,
+        },
+        body: JSON.stringify({
+          // keep provider for future routing; default to gpt-4o for now
+          model: 'gpt-4o',
+          messages: [
+            { role: 'system', content: system },
+            { role: 'user', content: user },
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        return json({ success: false, error: errText, provider }, { status: 502 });
+      }
+
+      const data = await response.json();
+      const text = data?.choices?.[0]?.message?.content ?? '';
+
+      return json({ success: true, provider, response: text });
+    } catch (error) {
+      return json({ success: false, error: error.message }, { status: 500 });
+    }
+  }
+
   return new Response(JSON.stringify({
     error: 'API endpoint not found',
     available_endpoints: [
@@ -727,7 +779,8 @@ async function handleAPI(request, env, ctx) {
       '/api/seo/page/:url',
       '/api/seo/update (POST)',
       '/api/seo/generate (POST)',
-      '/api/chat'
+      '/api/chat',
+      '/api/ai/:provider'
     ]
   }), {
     status: 404,

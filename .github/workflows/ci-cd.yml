@@ -68,7 +68,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy with Wrangler
+      - name: Apply D1 schema (remote)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          wranglerVersion: "3.109.0"
+          command: d1 execute meauxos --remote --file=schema.sql
+
+      - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
