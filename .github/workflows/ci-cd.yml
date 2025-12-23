@@ -2,9 +2,9 @@ name: CI/CD
 
 on:
   pull_request:
-    branches: ["main"]
+    branches: ["index"]
   push:
-    branches: ["main"]
+    branches: ["index"]
   workflow_dispatch:
 
 concurrency:
@@ -35,7 +35,7 @@ jobs:
     name: Deploy GitHub Pages
     runs-on: ubuntu-latest
     needs: checks
-    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
     permissions:
       contents: read
       pages: write
@@ -63,7 +63,7 @@ jobs:
     name: Deploy Cloudflare Worker
     runs-on: ubuntu-latest
     needs: checks
-    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CF_ACCOUNT_ID != '' }}
+    if: ${{ github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CF_ACCOUNT_ID != '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
